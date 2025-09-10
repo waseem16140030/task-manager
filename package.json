@@ -6,22 +6,52 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "codegen": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.1.0",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@hookform/resolvers": "^5.2.1",
+    "@tanstack/react-query": "^5.87.1",
+    "@tanstack/react-query-devtools": "^5.87.3",
+    "antd": "^5.27.3",
+    "axios": "^1.11.0",
+    "clsx": "^2.1.1",
+    "graphql": "^16.11.0",
+    "graphql-request": "^7.2.0",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
+    "msw": "^2.11.1",
+    "next": "15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.2"
+    "react-hook-form": "^7.62.0",
+    "yup": "^1.7.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@graphql-codegen/cli": "^6.0.0",
+    "@graphql-codegen/typescript": "^5.0.0",
+    "@graphql-codegen/typescript-msw": "^3.0.1",
+    "@graphql-codegen/typescript-operations": "^5.0.0",
+    "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

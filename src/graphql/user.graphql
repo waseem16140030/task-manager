@@ -1,0 +1,68 @@
+query GetUsers(
+  $pagination: PaginationInput
+  $filters: UserFilters
+  $sort: SortInput
+) {
+  users(pagination: $pagination, filters: $filters, sort: $sort) {
+    data {
+      id
+      name
+      email
+      role
+      status
+      registrationDate
+      phone
+      country
+    }
+    metadata {
+      total
+      page
+      pageSize
+    }
+  }
+}
+
+mutation CreateUser(
+  $name: String!
+  $email: String!
+  $phone: String!
+  $country: String!
+  $role: String!
+  $status: String!
+) {
+  createUser(
+    name: $name
+    email: $email
+    phone: $phone
+    country: $country
+    role: $role
+    status: $status
+  ) {
+    id
+    name
+    email
+    role
+    status
+    phone
+    country
+    registrationDate
+  }
+}
+
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}
+
+
+mutation EditUser($id: ID!, $input: EditUserInput!) {
+  editUser(id: $id, input: $input) {
+    id
+    name
+    email
+    phone
+    country
+    role
+    status
+    registrationDate
+  }
+}
