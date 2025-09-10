@@ -4,7 +4,7 @@ export const customFetcher = <TData, TVariables>(
   options?: RequestInit['headers']
 ): (() => Promise<TData>) => {
   return async () => {
-   const endPoint = "/graphql"
+   const endPoint = "https://task-manager-rouge-seven.vercel.app/graphql"
     const res = await fetch(endPoint, {
       method: 'POST',
       headers: {
