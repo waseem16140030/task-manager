@@ -6,15 +6,16 @@ export const customFetcher = <TData, TVariables>(
   return async () => {
     const endPoint =
       process.env.NODE_ENV === "production"
-        ? "https://task-manager-rouge-seven.vercel.app/graphql"
+        ? "/api/graphql" // relative path
         : "http://localhost:3000/api/graphql";
+
     const res = await fetch(endPoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        credentials: "include",
         ...options,
       },
+      credentials: "include",
       body: JSON.stringify({
         query,
         variables,
