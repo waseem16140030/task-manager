@@ -4,7 +4,7 @@ export const customFetcher = <TData, TVariables>(
   options?: RequestInit['headers']
 ): (() => Promise<TData>) => {
   return async () => {
-    const endPoint='http://localhost:3000/'
+   const endPoint = process.env.NEXT_PUBLIC_API_URL!
     const res = await fetch(endPoint, {
       method: 'POST',
       headers: {
