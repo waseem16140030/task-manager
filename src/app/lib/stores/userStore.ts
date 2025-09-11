@@ -22,7 +22,7 @@ export function generateMockUsers(): User[] {
       email: "waseem16140030@gmail.com",
       phone: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
       country: "Pakistan",
-      role: "admin",
+      role: "superAdmin",
       status: "active",
       registrationDate: new Date(
         Date.now() - Math.random() * 31536000000

@@ -11,7 +11,6 @@ import {
   UserConfig,
 } from "@/graphql/generated/graphql";
 
-
 export const verifyUserCredentials = async (
   email: string,
   password: string
@@ -53,7 +52,7 @@ export const createUser = async (user: User): Promise<User> => {
 export const getUsersConfig = async (): Promise<UserConfig[]> => {
   const { getUsers } = getServerUserStore();
   const activeUsers: UserConfig[] = getUsers()
-    .filter((u) => u.status === "active")
+    .filter((u) => u.status === "active" && u.role !== "superAdmin")
     .map(({ id, name }) => ({ id, name }));
 
   return activeUsers;
@@ -100,7 +99,7 @@ export const getUsersList = async (
   variables: GetUsersQueryVariables
 ): Promise<GetUsersQuery["users"]> => {
   const { getUsers } = getServerUserStore();
-  let users = getUsers();
+  let users = getUsers().filter((u) => u.role !== "superAdmin");
 
   // 1. Apply filters
   const { role, email, status } = variables?.filters ?? {};
