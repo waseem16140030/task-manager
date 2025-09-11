@@ -85,7 +85,7 @@ export const getUsersList = async (
   let users = getUsers();
 
   // 1. Apply filters
-  const { role, email, status } = variables.filters ?? {};
+  const { role, email, status } = variables?.filters ?? {};
   if (role) users = users.filter((u) => u.role === role);
   if (email)
     users = users.filter((u) =>
@@ -105,7 +105,7 @@ export const getUsersList = async (
   }
 
   // 2. Apply sorting
-  if (variables.sort?.field && variables.sort?.order) {
+  if (variables?.sort?.field && variables?.sort?.order) {
     const { field, order } = variables.sort;
     const direction = order.toLowerCase() === "asc" ? 1 : -1;
 
@@ -136,8 +136,8 @@ export const getUsersList = async (
 
   // 3. Apply pagination
   const total = users.length;
-  const page = variables.pagination?.page ?? 1;
-  const pageSize = variables.pagination?.pageSize ?? 10;
+  const page = variables?.pagination?.page ?? 1;
+  const pageSize = variables?.pagination?.pageSize ?? 10;
   const start = (page - 1) * pageSize;
   const paginated = users.slice(start, start + pageSize);
 

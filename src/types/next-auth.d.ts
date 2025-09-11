@@ -5,11 +5,13 @@ declare module "next-auth" {
     accessToken?: string;
     role?: string;
     name?: string;
+    status?:string
   }
 
   interface Session extends DefaultSession {
     accessToken?: string;
     user: User;
+    status?:string
   }
 }
 
@@ -18,5 +20,6 @@ declare module "next-auth/jwt" {
     accessToken?: string;
     role?: string;
     name?: string;
+    status?:string
   }
 }
