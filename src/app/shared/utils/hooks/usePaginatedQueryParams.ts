@@ -126,6 +126,14 @@ export function usePaginatedQueryParams({
     [updateQuery]
   );
 
+  // Generic pagination handler for List, Pagination component, etc.
+  const handlePagination = useCallback(
+    (page: number, size: number) => {
+      updateQuery({ current: page, pageSize: size });
+    },
+    [updateQuery]
+  );
+
   const handleSearch: ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
       updateQuery({ search: e.target.value.trim() ?? null, current: 1 });
@@ -149,7 +157,8 @@ export function usePaginatedQueryParams({
       sortOrder,
       selectedFilters,
       updateQuery,
-      onTableChange,
+      onTableChange, // For Table component
+      handlePagination, // For List or Pagination component
       handleSearch,
       handleSelectChange,
     }),
@@ -162,6 +171,7 @@ export function usePaginatedQueryParams({
       selectedFilters,
       updateQuery,
       onTableChange,
+      handlePagination,
       handleSearch,
       handleSelectChange,
     ]

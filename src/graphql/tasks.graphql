@@ -1,0 +1,48 @@
+query GetTasks($pagination: PaginationInput, $filters: TaskFilters) {
+  tasks(pagination: $pagination, filters: $filters) {
+    data {
+      id
+      description
+      title
+      status
+      createdAt
+      updatedAt
+      assigneeId
+    }
+    metadata {
+      total
+      page
+      pageSize
+    }
+  }
+}
+
+
+mutation CreateTask($input: TaskInput!) {
+  createTask(input: $input) {
+    id
+    title
+    description
+    status
+    createdAt
+    updatedAt
+    assignee {
+      id
+      name
+    }
+  }
+}
+
+mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
+  updateTask(id: $id, input: $input) {
+    id
+    title
+    description
+    status
+    updatedAt
+  }
+}
+
+mutation DeleteTask($id: ID!) {
+  deleteTask(id: $id)
+}

@@ -42,6 +42,15 @@ type UsersResponse {
   metadata: Metadata!
 }
 
+type Query {
+  usersConfig: [UserConfig!]!
+}
+
+type UserConfig {
+  id: ID!
+  name: String!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -88,4 +97,59 @@ type Mutation {
   ): User!
   deleteUser(id: ID!): Boolean!
   editUser(id: ID!, input: EditUserInput!): User!
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  BLOCKED
+  DONE
+  CANCELLED
+}
+
+type Task {
+  id: ID!
+  title: String!
+  description: String
+  status: TaskStatus!
+  assignee: User
+  createdAt: String!
+  updatedAt: String!
+  assigneeId:String
+}
+
+input TaskInput {
+  title: String!
+  description: String
+  assigneeId: ID
+}
+
+input UpdateTaskInput {
+  title: String
+  description: String
+  status: String
+  assigneeId: ID
+}
+
+input TaskFilters {
+  status: String
+  search: String
+}
+
+type TasksResponse {
+  data: [Task!]!
+  metadata: Metadata!
+}
+
+extend type Query {
+  tasks(pagination: PaginationInput, filters: TaskFilters): TasksResponse!
+  task(id: ID!): Task
+}
+
+extend type Mutation {
+  createTask(input: TaskInput!): Task!
+  updateTask(id: ID!, input: UpdateTaskInput!): Task!
+  deleteTask(id: ID!): Boolean!
 }
