@@ -2,7 +2,6 @@
 import {
   CreateUserMutationVariables,
   EditUserInput,
-  EditUserMutationVariables,
   useEditUserMutation,
   useGetUsersQuery,
   User,

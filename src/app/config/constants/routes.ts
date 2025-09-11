@@ -7,4 +7,5 @@ export const routeKey = {
   ANALYTICS: "/analytics",
   USER_SUPPORT: "/user-support",
   SETTINGS: "/settings",
+  TASKS:'/tasks-management'
 };

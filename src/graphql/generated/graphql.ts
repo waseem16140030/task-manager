@@ -45,12 +45,20 @@ export type Metadata = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createTask: Task;
   createUser: User;
+  deleteTask: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   editUser: User;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
   register: AuthPayload;
+  updateTask: Task;
+};
+
+
+export type MutationCreateTaskArgs = {
+  input: TaskInput;
 };
 
 
@@ -61,6 +69,11 @@ export type MutationCreateUserArgs = {
   phone: Scalars['String']['input'];
   role: Scalars['String']['input'];
   status: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteTaskArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -84,6 +97,12 @@ export type MutationRegisterArgs = {
   input: RegisterInput;
 };
 
+
+export type MutationUpdateTaskArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateTaskInput;
+};
+
 export type PaginationInput = {
   page?: InputMaybe<Scalars['Int']['input']>;
   pageSize?: InputMaybe<Scalars['Int']['input']>;
@@ -92,7 +111,21 @@ export type PaginationInput = {
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
+  task?: Maybe<Task>;
+  tasks: TasksResponse;
   users: UsersResponse;
+  usersConfig: Array<UserConfig>;
+};
+
+
+export type QueryTaskArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryTasksArgs = {
+  filters?: InputMaybe<TaskFilters>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 
@@ -116,6 +149,52 @@ export type SortInput = {
   order?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Task = {
+  __typename?: 'Task';
+  assignee?: Maybe<User>;
+  assigneeId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  status: TaskStatus;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
+export type TaskFilters = {
+  search?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TaskInput = {
+  assigneeId?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
+};
+
+export enum TaskStatus {
+  Backlog = 'BACKLOG',
+  Blocked = 'BLOCKED',
+  Cancelled = 'CANCELLED',
+  Done = 'DONE',
+  InProgress = 'IN_PROGRESS',
+  InReview = 'IN_REVIEW',
+  Todo = 'TODO'
+}
+
+export type TasksResponse = {
+  __typename?: 'TasksResponse';
+  data: Array<Task>;
+  metadata: Metadata;
+};
+
+export type UpdateTaskInput = {
+  assigneeId?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type User = {
   __typename?: 'User';
   country?: Maybe<Scalars['String']['output']>;
@@ -127,6 +206,12 @@ export type User = {
   registrationDate?: Maybe<Scalars['String']['output']>;
   role?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserConfig = {
+  __typename?: 'UserConfig';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type UserFilters = {
@@ -152,6 +237,36 @@ export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetCurrentUserQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, name: string, email: string, role?: string | null, status?: string | null, phone?: string | null, country?: string | null, registrationDate?: string | null } | null };
+
+export type GetTasksQueryVariables = Exact<{
+  pagination?: InputMaybe<PaginationInput>;
+  filters?: InputMaybe<TaskFilters>;
+}>;
+
+
+export type GetTasksQuery = { __typename?: 'Query', tasks: { __typename?: 'TasksResponse', data: Array<{ __typename?: 'Task', id: string, description?: string | null, title: string, status: TaskStatus, createdAt: string, updatedAt: string, assigneeId?: string | null }>, metadata: { __typename?: 'Metadata', total: number, page: number, pageSize: number } } };
+
+export type CreateTaskMutationVariables = Exact<{
+  input: TaskInput;
+}>;
+
+
+export type CreateTaskMutation = { __typename?: 'Mutation', createTask: { __typename?: 'Task', id: string, title: string, description?: string | null, status: TaskStatus, createdAt: string, updatedAt: string, assignee?: { __typename?: 'User', id: string, name: string } | null } };
+
+export type UpdateTaskMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateTaskInput;
+}>;
+
+
+export type UpdateTaskMutation = { __typename?: 'Mutation', updateTask: { __typename?: 'Task', id: string, title: string, description?: string | null, status: TaskStatus, updatedAt: string } };
+
+export type DeleteTaskMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteTaskMutation = { __typename?: 'Mutation', deleteTask: boolean };
 
 export type GetUsersQueryVariables = Exact<{
   pagination?: InputMaybe<PaginationInput>;
@@ -180,6 +295,11 @@ export type DeleteUserMutationVariables = Exact<{
 
 
 export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+
+export type GetUsersConfigQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUsersConfigQuery = { __typename?: 'Query', usersConfig: Array<{ __typename?: 'UserConfig', id: string, name: string }> };
 
 export type EditUserMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -281,6 +401,152 @@ useInfiniteGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariable
 
 
 useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables, options);
+
+export const GetTasksDocument = `
+    query GetTasks($pagination: PaginationInput, $filters: TaskFilters) {
+  tasks(pagination: $pagination, filters: $filters) {
+    data {
+      id
+      description
+      title
+      status
+      createdAt
+      updatedAt
+      assigneeId
+    }
+    metadata {
+      total
+      page
+      pageSize
+    }
+  }
+}
+    `;
+
+export const useGetTasksQuery = <
+      TData = GetTasksQuery,
+      TError = unknown
+    >(
+      variables?: GetTasksQueryVariables,
+      options?: Omit<UseQueryOptions<GetTasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetTasksQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetTasksQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetTasks'] : ['GetTasks', variables],
+    queryFn: customFetcher<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, variables),
+    ...options
+  }
+    )};
+
+useGetTasksQuery.getKey = (variables?: GetTasksQueryVariables) => variables === undefined ? ['GetTasks'] : ['GetTasks', variables];
+
+export const useInfiniteGetTasksQuery = <
+      TData = InfiniteData<GetTasksQuery>,
+      TError = unknown
+    >(
+      variables: GetTasksQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetTasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetTasksQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetTasksQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetTasks.infinite'] : ['GetTasks.infinite', variables],
+      queryFn: (metaData) => customFetcher<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetTasksQuery.getKey = (variables?: GetTasksQueryVariables) => variables === undefined ? ['GetTasks.infinite'] : ['GetTasks.infinite', variables];
+
+
+useGetTasksQuery.fetcher = (variables?: GetTasksQueryVariables, options?: RequestInit['headers']) => customFetcher<GetTasksQuery, GetTasksQueryVariables>(GetTasksDocument, variables, options);
+
+export const CreateTaskDocument = `
+    mutation CreateTask($input: TaskInput!) {
+  createTask(input: $input) {
+    id
+    title
+    description
+    status
+    createdAt
+    updatedAt
+    assignee {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export const useCreateTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>) => {
+    
+    return useMutation<CreateTaskMutation, TError, CreateTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateTask'],
+    mutationFn: (variables?: CreateTaskMutationVariables) => customFetcher<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useCreateTaskMutation.fetcher = (variables: CreateTaskMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, variables, options);
+
+export const UpdateTaskDocument = `
+    mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
+  updateTask(id: $id, input: $input) {
+    id
+    title
+    description
+    status
+    updatedAt
+  }
+}
+    `;
+
+export const useUpdateTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateTaskMutation, TError, UpdateTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateTask'],
+    mutationFn: (variables?: UpdateTaskMutationVariables) => customFetcher<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useUpdateTaskMutation.fetcher = (variables: UpdateTaskMutationVariables, options?: RequestInit['headers']) => customFetcher<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument, variables, options);
+
+export const DeleteTaskDocument = `
+    mutation DeleteTask($id: ID!) {
+  deleteTask(id: $id)
+}
+    `;
+
+export const useDeleteTaskMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteTaskMutation, TError, DeleteTaskMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteTask'],
+    mutationFn: (variables?: DeleteTaskMutationVariables) => customFetcher<DeleteTaskMutation, DeleteTaskMutationVariables>(DeleteTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useDeleteTaskMutation.fetcher = (variables: DeleteTaskMutationVariables, options?: RequestInit['headers']) => customFetcher<DeleteTaskMutation, DeleteTaskMutationVariables>(DeleteTaskDocument, variables, options);
 
 export const GetUsersDocument = `
     query GetUsers($pagination: PaginationInput, $filters: UserFilters, $sort: SortInput) {
@@ -405,6 +671,57 @@ export const useDeleteUserMutation = <
 
 
 useDeleteUserMutation.fetcher = (variables: DeleteUserMutationVariables, options?: RequestInit['headers']) => customFetcher<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, variables, options);
+
+export const GetUsersConfigDocument = `
+    query GetUsersConfig {
+  usersConfig {
+    id
+    name
+  }
+}
+    `;
+
+export const useGetUsersConfigQuery = <
+      TData = GetUsersConfigQuery,
+      TError = unknown
+    >(
+      variables?: GetUsersConfigQueryVariables,
+      options?: Omit<UseQueryOptions<GetUsersConfigQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersConfigQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUsersConfigQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUsersConfig'] : ['GetUsersConfig', variables],
+    queryFn: customFetcher<GetUsersConfigQuery, GetUsersConfigQueryVariables>(GetUsersConfigDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUsersConfigQuery.getKey = (variables?: GetUsersConfigQueryVariables) => variables === undefined ? ['GetUsersConfig'] : ['GetUsersConfig', variables];
+
+export const useInfiniteGetUsersConfigQuery = <
+      TData = InfiniteData<GetUsersConfigQuery>,
+      TError = unknown
+    >(
+      variables: GetUsersConfigQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUsersConfigQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersConfigQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUsersConfigQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUsersConfig.infinite'] : ['GetUsersConfig.infinite', variables],
+      queryFn: (metaData) => customFetcher<GetUsersConfigQuery, GetUsersConfigQueryVariables>(GetUsersConfigDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUsersConfigQuery.getKey = (variables?: GetUsersConfigQueryVariables) => variables === undefined ? ['GetUsersConfig.infinite'] : ['GetUsersConfig.infinite', variables];
+
+
+useGetUsersConfigQuery.fetcher = (variables?: GetUsersConfigQueryVariables, options?: RequestInit['headers']) => customFetcher<GetUsersConfigQuery, GetUsersConfigQueryVariables>(GetUsersConfigDocument, variables, options);
 
 export const EditUserDocument = `
     mutation EditUser($id: ID!, $input: EditUserInput!) {

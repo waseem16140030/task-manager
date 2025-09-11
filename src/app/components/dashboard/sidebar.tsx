@@ -7,6 +7,7 @@ import {
   CreditCardOutlined,
   MessageOutlined,
   NotificationOutlined,
+  ScheduleOutlined,
   SecurityScanOutlined,
   SettingOutlined,
   UsergroupAddOutlined,
@@ -36,6 +37,11 @@ export function DashboardSidebar() {
       key: routeKey.USERS_MANAGEMENT,
       label: "User Management",
       icon: <UsergroupAddOutlined />,
+    },
+    {
+      key: routeKey.TASKS,
+      label: "Tasks Management",
+      icon: <ScheduleOutlined /> ,
     },
     {
       key: routeKey.PUSH_NOTIFICATIONS,

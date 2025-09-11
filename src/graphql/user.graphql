@@ -53,6 +53,12 @@ mutation DeleteUser($id: ID!) {
   deleteUser(id: $id)
 }
 
+query GetUsersConfig {
+  usersConfig {
+    id
+    name
+  }
+}
 
 mutation EditUser($id: ID!, $input: EditUserInput!) {
   editUser(id: $id, input: $input) {

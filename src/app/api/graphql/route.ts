@@ -7,13 +7,23 @@ import {
   getUsersList,
   deleteUser,
   editUserById,
+  createTask,
+  getTasksList,
+  updateTask,
+  deleteTask,
+  getUsersConfig,
 } from "@/app/lib";
 import {
+  CreateTaskMutationVariables,
+  DeleteTaskMutationVariables,
   DeleteUserMutationVariables,
   EditUserMutationVariables,
+  GetTasksQueryVariables,
   GetUsersQueryVariables,
   LoginInput,
   RegisterInput,
+  TaskStatus,
+  UpdateTaskMutationVariables,
   User,
 } from "@/graphql/generated/graphql";
 
@@ -36,6 +46,7 @@ export async function POST(req: Request) {
     }
 
     const { query, variables } = body ?? {};
+    
 
     if (!query) {
       return NextResponse.json(
@@ -105,8 +116,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ data: { register: userWithoutPassword } });
     }
 
+
+     //Get active Users Query
+    if (query.includes("GetUsersConfig")) {
+      const data = await getUsersConfig();
+      return NextResponse.json({ data: { usersConfig: data } });
+    }
+
+
     //GetUsersList Query
-    if (query.includes("GetUsers") ?? query.includes("users")) {
+    if (query.includes("GetUsers")) {
       const payload = variables as GetUsersQueryVariables;
       const usersResponse = await getUsersList(payload);
       return NextResponse.json({ data: { users: usersResponse } });
@@ -122,12 +141,52 @@ export async function POST(req: Request) {
     //Edit User Mutation
     if (query.includes("EditUser")) {
       const payload = variables as EditUserMutationVariables;
-      console.log(payload, 'Payload')
       const { id, input } = payload ?? {};
       const editUserResponse = await editUserById(id, {
         ...(input as User),
       });
       return NextResponse.json({ data: { editUser: editUserResponse } });
+    }
+
+   
+
+    //Add Task Mutation
+    if (query.includes("CreateTask")) {
+      const payload = variables as CreateTaskMutationVariables;
+      const { input } = payload ?? {};
+      const editUserResponse = await createTask({
+        ...input,
+      });
+      return NextResponse.json({ data: { editUser: editUserResponse } });
+    }
+
+    //GetTasksList Query
+    if (query.includes("GetTasks") ?? query.includes("users")) {
+      const payload = variables as GetTasksQueryVariables;
+      const tasksResponse = await getTasksList(payload);
+      return NextResponse.json({ data: { tasks: tasksResponse } });
+    }
+
+    //Update Task Mutation
+    if (query.includes("UpdateTask")) {
+      const payload = variables as UpdateTaskMutationVariables;
+      const { id, input } = payload ?? {};
+      const { status, title } = input ?? {};
+      const taskStatus: TaskStatus =
+        (status as TaskStatus) ?? TaskStatus.Backlog;
+      const updateTaskResponse = await updateTask(id, {
+        ...input,
+        status: taskStatus,
+        title: title ?? "",
+      });
+      return NextResponse.json({ data: { editUser: updateTaskResponse } });
+    }
+
+    //Delete Task Mutation
+    if (query.includes("DeleteTask")) {
+      const payload = variables as DeleteTaskMutationVariables;
+      const deleteTaskResponse = await deleteTask(payload.id);
+      return NextResponse.json({ data: deleteTaskResponse });
     }
 
     return NextResponse.json(

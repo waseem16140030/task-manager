@@ -1,8 +1,14 @@
-import { useUserStore } from "@/app/lib/stores";
+import { useTaskStore, useUserStore } from "@/app/lib/stores";
 import {
+  GetTasksQuery,
+  GetTasksQueryVariables,
   GetUsersQuery,
   GetUsersQueryVariables,
+  Task,
+  TaskInput,
+  TaskStatus,
   User,
+  UserConfig,
 } from "@/graphql/generated/graphql";
 
 export const verifyUserCredentials = async (
@@ -39,6 +45,15 @@ export const createUser = async (user: User): Promise<User> => {
     registrationDate: registrationDate ?? Date.now().toString(),
   });
   return user;
+};
+
+export const getUsersConfig = async (): Promise<UserConfig[]> => {
+  const { getUsers } = useUserStore.getState();
+  const activeUsers: UserConfig[] = getUsers()
+    .filter((u) => u.status === "active")
+    .map(({ id, name }) => ({ id, name }));
+
+  return activeUsers;
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
@@ -151,4 +166,78 @@ export const getUsersList = async (
       pageSize,
     },
   };
+};
+
+export const createTask = async (task: TaskInput): Promise<Task> => {
+  const { addTask } = useTaskStore.getState();
+  const newTask: Task = {
+    ...task,
+    id: `task-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: TaskStatus.Backlog,
+  };
+  addTask(newTask);
+  return newTask;
+};
+
+export const getTasksList = async (
+  variables: GetTasksQueryVariables
+): Promise<GetTasksQuery["tasks"]> => {
+  const { getTasks } = useTaskStore.getState();
+  let tasks: Task[] = getTasks();
+
+  // Filters
+  const status = variables?.filters?.status;
+  const searchRaw = variables?.filters?.search;
+  const search = searchRaw?.trim().toLowerCase();
+
+  if (status) {
+    tasks = tasks.filter((t) => t.status === status);
+  }
+
+  if (search) {
+    tasks = tasks.filter((t) => {
+      const title = (t.title ?? "").toLowerCase();
+      const desc = (t.description ?? "").toLowerCase();
+      return title.includes(search) || desc.includes(search);
+    });
+  }
+
+  // Pagination
+  const total = tasks.length;
+  const page = variables?.pagination?.page ?? 1;
+  const pageSize = variables?.pagination?.pageSize ?? 10;
+  const start = Math.max(0, (page - 1) * pageSize);
+  const paginated = tasks.slice(start, start + pageSize);
+
+  return {
+    data: paginated,
+    metadata: {
+      total,
+      page,
+      pageSize,
+    },
+  };
+};
+
+export const updateTask = async (
+  id: string,
+  updates: Partial<Task>
+): Promise<Task | null> => {
+  const { getTasks, updateTaskById } = useTaskStore.getState();
+  const existing = getTasks().find((t) => t.id === id);
+  if (!existing) return null;
+
+  updateTaskById(id, updates);
+  return { ...existing, ...updates };
+};
+
+export const deleteTask = async (id: string): Promise<boolean> => {
+  const { getTasks, removeTaskById } = useTaskStore.getState();
+  const exists = getTasks().some((t) => t.id === id);
+  if (!exists) return false;
+
+  removeTaskById(id);
+  return true;
 };
