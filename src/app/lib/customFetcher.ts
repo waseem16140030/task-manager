@@ -4,10 +4,7 @@ export const customFetcher = <TData, TVariables>(
   options?: RequestInit["headers"]
 ): (() => Promise<TData>) => {
   return async () => {
-    const endPoint =
-      process.env.NODE_ENV === "production"
-        ? "/api/graphql" // relative path
-        : "http://localhost:3000/api/graphql";
+    const endPoint = process.env.NEXT_PUBLIC_API_URL!;
 
     const res = await fetch(endPoint, {
       method: "POST",
@@ -15,7 +12,6 @@ export const customFetcher = <TData, TVariables>(
         "Content-Type": "application/json",
         ...options,
       },
-      credentials: "include",
       body: JSON.stringify({
         query,
         variables,
@@ -25,7 +21,7 @@ export const customFetcher = <TData, TVariables>(
     const json = await res.json();
 
     if (json.errors) {
-      const { message } = json.errors[0] || {};
+      const { message } = json.errors[0] ?? {};
       throw new Error(message ?? "Error…");
     }
 

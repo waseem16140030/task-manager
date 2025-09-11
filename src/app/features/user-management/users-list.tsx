@@ -3,7 +3,10 @@ import { SearchInput, TMTag, TMText } from "@/app/components";
 import {
   formatDate,
   usePaginatedQueryParams,
+  userRoleColorMap,
+  userRoleIconMap,
   userStatusColorMap,
+  useUserOptions,
 } from "@/app/shared/utils";
 import { useGetUsersQuery, User } from "@/graphql/generated/graphql";
 import {
@@ -15,7 +18,10 @@ import {
 } from "antd";
 import { capitalize } from "lodash";
 import { useQuery } from "@tanstack/react-query";
-import { AddUser } from "./add-user";
+import { AddUser, DeleteUser, EditUser } from ".";
+import React from "react";
+
+
 
 export function UsersList() {
   const {
@@ -29,6 +35,8 @@ export function UsersList() {
     sortField,
     sortOrder,
   } = usePaginatedQueryParams({ filterKeys: ["role"] });
+
+  const { roles } = useUserOptions()
 
   const queryKey = useGetUsersQuery.getKey({
     pagination: { page: current, pageSize },
@@ -93,6 +101,21 @@ export function UsersList() {
       ),
     },
     {
+      key: "role",
+      dataIndex: "role",
+      title: "Role",
+      align: "center",
+      render: (_, { role }) => {
+        const icon = React.createElement(userRoleIconMap[role!]);
+        const color = userRoleColorMap[role!]
+        return (
+          <TMTag className="tw:!m-0" color={color} icon={icon} >
+            {capitalize(role ?? "")}
+          </TMTag>
+        );
+      },
+    },
+    {
       key: "status",
       dataIndex: "status",
       title: "Status",
@@ -106,6 +129,18 @@ export function UsersList() {
         );
       },
     },
+    {
+      title: "Actions",
+      dataIndex: 'id',
+      key: 'actions',
+      align: 'center',
+      render: (_, user) => (
+        <div className="tw:flex tw:items-center tw:justify-center tw:gap-x-1.5 tw:flex-shrink-0">
+          <EditUser userData={user} />
+          <DeleteUser userId={user.id} />
+        </div>
+      )
+    }
   ];
 
   return (
@@ -119,6 +154,7 @@ export function UsersList() {
               onChange={handleSearch}
             />
             <Select
+              options={roles}
               defaultValue={selectedFilters?.role}
               onChange={(value) => handleSelectChange("role", value)}
               allowClear
@@ -128,7 +164,7 @@ export function UsersList() {
             />
           </div>
           <div className="tw:order-1 tw:justify-self-end tw:sm:order-2">
-           <AddUser/>
+            <AddUser />
           </div>
         </div>
         <Table

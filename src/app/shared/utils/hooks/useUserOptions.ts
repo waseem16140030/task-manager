@@ -9,7 +9,6 @@ export function useUserOptions(): {
   const roles = useMemo<SelectProps["options"]>(
     () => [
       { label: "Admin", value: "admin" },
-      { label: "Manager", value: "manager" },
       { label: "User", value: "user" },
     ],
     []
@@ -17,6 +16,7 @@ export function useUserOptions(): {
 
   const countries = useMemo<SelectProps["options"]>(
     () => [
+      { label: "Pakistan", value: "Pakistan" },
       { label: "USA", value: "USA" },
       { label: "UK", value: "UK" },
       { label: "Canada", value: "Canada" },
@@ -28,7 +28,7 @@ export function useUserOptions(): {
   const statuses = useMemo<SelectProps["options"]>(
     () => [
       { label: "Active", value: "active" },
-      { label: "Banned", value: "banned" },
+      { label: "InActive", value: "inactive" },
       { label: "Pending", value: "pending" },
     ],
     []

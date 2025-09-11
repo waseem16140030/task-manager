@@ -10,6 +10,7 @@
     "codegen": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
+    "@ant-design/icons": "5.x",
     "@ant-design/nextjs-registry": "^1.1.0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@hookform/resolvers": "^5.2.1",
