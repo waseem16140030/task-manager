@@ -1,4 +1,4 @@
-import { useTaskStore, useUserStore } from "@/app/lib/stores";
+import { getServerTaskStore, getServerUserStore } from "@/app/lib/stores";
 import {
   GetTasksQuery,
   GetTasksQueryVariables,
@@ -15,7 +15,7 @@ export const verifyUserCredentials = async (
   email: string,
   password: string
 ): Promise<User | null> => {
-  const { getUsers } = useUserStore.getState();
+  const { getUsers } = getServerUserStore();
   return (
     getUsers().find((u) => u.email === email && u.password === password) ?? null
   );
@@ -38,7 +38,7 @@ export const generateJWT = (user: User): string => {
 
 export const createUser = async (user: User): Promise<User> => {
   const { password, registrationDate, ...restUser } = user;
-  const { addUser } = useUserStore.getState();
+  const { addUser } = getServerUserStore();
   addUser({
     ...restUser,
     password: password ?? "password@123",
@@ -48,7 +48,7 @@ export const createUser = async (user: User): Promise<User> => {
 };
 
 export const getUsersConfig = async (): Promise<UserConfig[]> => {
-  const { getUsers } = useUserStore.getState();
+  const { getUsers } = getServerUserStore();
   const activeUsers: UserConfig[] = getUsers()
     .filter((u) => u.status === "active")
     .map(({ id, name }) => ({ id, name }));
@@ -57,12 +57,12 @@ export const getUsersConfig = async (): Promise<UserConfig[]> => {
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const { getUsers } = useUserStore.getState();
+  const { getUsers } = getServerUserStore();
   return getUsers().find((u) => u.email === email) ?? null;
 };
 
 export const deleteUser = async (id: string): Promise<boolean> => {
-  const { getUsers, removeUserById } = useUserStore.getState();
+  const { getUsers, removeUserById } = getServerUserStore();
   const exists = getUsers().some((u) => u.id === id);
 
   if (!exists) {
@@ -77,7 +77,7 @@ export const editUserById = async (
   id: string,
   updates: Partial<User>
 ): Promise<User | null> => {
-  const { getUsers, updateUserById } = useUserStore.getState();
+  const { getUsers, updateUserById } = getServerUserStore();
   const existingUser = getUsers().find((u) => u.id === id);
 
   if (!existingUser) {
@@ -96,7 +96,7 @@ export const editUserById = async (
 export const getUsersList = async (
   variables: GetUsersQueryVariables
 ): Promise<GetUsersQuery["users"]> => {
-  const { getUsers } = useUserStore.getState();
+  const { getUsers } = getServerUserStore();
   let users = getUsers();
 
   // 1. Apply filters
@@ -169,7 +169,7 @@ export const getUsersList = async (
 };
 
 export const createTask = async (task: TaskInput): Promise<Task> => {
-  const { addTask } = useTaskStore.getState();
+  const { addTask } = getServerTaskStore();
   const newTask: Task = {
     ...task,
     id: `task-${Date.now()}`,
@@ -184,7 +184,7 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
 export const getTasksList = async (
   variables: GetTasksQueryVariables
 ): Promise<GetTasksQuery["tasks"]> => {
-  const { getTasks } = useTaskStore.getState();
+  const { getTasks } = getServerTaskStore();
   let tasks: Task[] = getTasks();
 
   // Filters
@@ -225,7 +225,7 @@ export const updateTask = async (
   id: string,
   updates: Partial<Task>
 ): Promise<Task | null> => {
-  const { getTasks, updateTaskById } = useTaskStore.getState();
+  const { getTasks, updateTaskById } = getServerTaskStore();
   const existing = getTasks().find((t) => t.id === id);
   if (!existing) return null;
 
@@ -234,7 +234,7 @@ export const updateTask = async (
 };
 
 export const deleteTask = async (id: string): Promise<boolean> => {
-  const { getTasks, removeTaskById } = useTaskStore.getState();
+  const { getTasks, removeTaskById } = getServerTaskStore();
   const exists = getTasks().some((t) => t.id === id);
   if (!exists) return false;
 

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { User } from "@/graphql/generated/graphql";
+import { createUniversalStorage } from "..";
 
 interface UserStore {
   users: User[];
@@ -9,24 +10,26 @@ interface UserStore {
   removeUserById: (id: string) => void;
   updateUserRole: (id: string, role: User["role"]) => void;
   updateUserById: (id: string, newData: Partial<User>) => void;
+  hydrate: (users: User[]) => void;
 }
 
 export function generateMockUsers(): User[] {
-  return [{
-    id: 'waseem6140030',
-    name: 'Muhammad Waseem',
-    password:'admin@6Well',
-    email: 'waseem16140030@gmail.com',
-    phone: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-    country: "Pakistan",
-    role: "admin",
-    status: "active",
-    registrationDate: new Date(
-      Date.now() - Math.random() * 31536000000
-    ).toISOString(),
-  }]
+  return [
+    {
+      id: "waseem6140030",
+      name: "Muhammad Waseem",
+      password: "admin@6Well",
+      email: "waseem16140030@gmail.com",
+      phone: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+      country: "Pakistan",
+      role: "admin",
+      status: "active",
+      registrationDate: new Date(
+        Date.now() - Math.random() * 31536000000
+      ).toISOString(),
+    },
+  ];
 }
-
 
 export const useUserStore = create<UserStore>()(
   persist(
@@ -51,10 +54,12 @@ export const useUserStore = create<UserStore>()(
             user.id === id ? { ...user, ...newData } : user
           ),
         })),
+      hydrate: (users: User[]) => set({ users }),
     }),
     {
       name: "user-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createUniversalStorage()),
+      skipHydration: typeof window === "undefined",
     }
   )
 );

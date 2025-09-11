@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { Task } from "@/graphql/generated/graphql";
+import { createUniversalStorage } from "..";
+
 
 interface TaskStore {
   tasks: Task[];
@@ -8,6 +10,7 @@ interface TaskStore {
   addTask: (task: Task) => void;
   updateTaskById: (id: string, updates: Partial<Task>) => void;
   removeTaskById: (id: string) => void;
+  hydrate: (tasks: Task[]) => void;
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -29,10 +32,12 @@ export const useTaskStore = create<TaskStore>()(
         set((state) => ({
           tasks: state.tasks.filter((task) => task.id !== id),
         })),
+      hydrate: (tasks: Task[]) => set({ tasks }),
     }),
     {
       name: "task-storage",
-      storage: createJSONStorage(() => localStorage),
+     storage: createJSONStorage(() => createUniversalStorage()),
+      skipHydration: typeof window === "undefined",
     }
   )
 );
