@@ -7,14 +7,14 @@ import {
 import React from "react";
 
 export const userRoleColorMap: Record<string, TagProps["color"]> = {
-  admin: "green-inverse",
-  user: "gold-inverse",
-  manager: "blue-inverse",
+  admin: 'orange',
+  user: 'magenta',
+  manager: 'orange',
 };
 
 export const userStatusColorMap: Record<string, TagProps["color"]> = {
   active: "green",
-  banned: "error",
+  inactive: "error",
   pending: "blue",
 };
 

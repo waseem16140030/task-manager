@@ -15,6 +15,7 @@ import { routeKey } from "@/app/config";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import logoImg from '@root/public/logo.png'
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -83,7 +84,7 @@ export function DashboardSidebar() {
         }}
       >
         <Link href={routeKey.USERS_MANAGEMENT}>
-         <Image src="/logo.png" alt="Task Manager Icon" height={60} width={120} className="tw:max-w-full" />
+          <Image src={logoImg} alt="Task Manager Icon" height={60} width={120} className="tw:max-w-full" priority={false} />
         </Link>
       </div>
       <Menu
