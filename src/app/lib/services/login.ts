@@ -1,43 +1,38 @@
 "use server";
-import { cookies } from "next/headers";
-import { customFetcher } from "@/app/lib/customFetcher";
-import {
-  LoginDocument,
-  type LoginMutation,
-  type LoginMutationVariables,
-} from "@/graphql/generated/graphql";
 
-export async function loginServerAction(params: {
+import { verifyUserCredentials, generateJWT } from "@/app/lib"; // your existing helpers
+import { User } from "@/graphql/generated/graphql";
+
+export async function loginAction(credentials: {
   email: string;
   password: string;
 }) {
-  const loginFn = customFetcher<LoginMutation, LoginMutationVariables>(
-    LoginDocument,
-    {
-      input: {
-        email: params.email,
-        password: params.password,
-      },
+  try {
+    const user = await verifyUserCredentials(
+      credentials.email,
+      credentials.password
+    );
+
+    if (!user) {
+      throw new Error("Invalid email or password");
     }
-  );
 
-  const userResponse = await loginFn();
-  const { login } = userResponse ?? {};
+    if (user.status !== "active") {
+      throw new Error("Account is not active");
+    }
 
-  if (!login?.user || !login?.token) {
-    return null;
+    // generate token with your util
+    const token = generateJWT(user);
+
+    // return the user without password
+    const { password, ...safeUser } = user as User & { password?: string };
+
+    return {
+      token,
+      user: safeUser,
+    };
+  } catch (err: unknown) {
+    const newError = err as Error;
+    throw new Error(newError?.message ?? "Login failed");
   }
-
-  const cookiesStore = await cookies();
-  cookiesStore.set("token", login.token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-
-  return {
-    token: login.token,
-    user: login.user,
-  };
 }

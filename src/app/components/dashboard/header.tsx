@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   Avatar,
   Divider,
@@ -12,13 +12,13 @@ import React from "react";
 
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { SearchInput } from "@/app/components";
-import { cleanup, useAuthStore } from "@/app/lib";
-import { useRouter } from "next/navigation";
+import { cleanup } from "@/app/lib";
+import { signOut, useSession } from "next-auth/react";
 
 export function DashboardHeader() {
   const { token } = theme.useToken();
-  const { logout } = useAuthStore();
-  const { replace } = useRouter();
+  const { data, status } = useSession();
+  const { user } = data ?? {};
 
   const { Header } = Layout;
   const { Text } = Typography;
@@ -64,9 +64,8 @@ export function DashboardHeader() {
   ];
 
   const handleLogout = async () => {
+    await signOut({ callbackUrl: "/auth/signin" });
     await cleanup();
-    logout();
-    replace("/auth/signin");
   };
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
@@ -94,9 +93,11 @@ export function DashboardHeader() {
               <div style={contentStyle}>
                 <>
                   <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:p-4 tw:gap-y-1">
-                    <Avatar size="large">M</Avatar>
-                    <Text>Muhammad Waseem</Text>
-                    <Text type="secondary">waseem16140030@gmail.com</Text>
+                    <Avatar size="large">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </Avatar>
+                    <Text>{user?.name}</Text>
+                    <Text type="secondary">{user?.email}</Text>
                   </div>
                   <Divider
                     style={{
@@ -113,12 +114,12 @@ export function DashboardHeader() {
               </div>
             )}
           >
-            <Avatar
-              icon={<UserOutlined />}
-              size={32}
-              className="tw:cursor-pointer"
-            >
-              Muhammad Waseem
+            <Avatar size={32} className="tw:cursor-pointer">
+              {user?.name ? (
+                user.name.charAt(0).toUpperCase()
+              ) : (
+                <UserOutlined />
+              )}
             </Avatar>
           </Dropdown>
         </div>
