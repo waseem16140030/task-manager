@@ -9,12 +9,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginInput } from "@/graphql/generated/graphql";
 import { loginSchema } from "@/app/lib";
 import { useState } from "react";
-import { signIn } from 'next-auth/react'
+import { signIn } from "next-auth/react";
 
 export function SignInForm() {
   const { replace } = useRouter();
   const { openNotification } = useGlobalNotification();
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setLoading] = useState(false);
 
   const methods = useForm<LoginInput>({
     resolver: yupResolver(loginSchema),
@@ -22,24 +22,24 @@ export function SignInForm() {
   const { handleSubmit } = methods;
 
   const onSubmitLogin = async (data: LoginInput) => {
-    const { email, password } = data
-    setLoading(true)
-    const res = await signIn('credentials', {
+    const { email, password } = data;
+    setLoading(true);
+    const res = await signIn("credentials", {
       redirect: false,
       email,
       password,
-    })
+    });
 
     if (res?.ok) {
-      replace('/')
+      replace("/");
     } else {
       openNotification({
-        type: 'error',
-        description: 'Invalid credentials or server error',
-      })
+        type: "error",
+        description: "Invalid credentials or server error",
+      });
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <FormProvider {...methods}>
@@ -52,7 +52,7 @@ export function SignInForm() {
             placeholder="Enter password"
           />
           <div className="tw:flex tw:flex-col tw:gap-y-4">
-            <Link className="tw:text-right" href="/auth/forgot-password">
+            <Link className="tw:text-right" href="#">
               <Button className="tw:!px-0" variant="text" type="link">
                 Forgot Password ?
               </Button>
@@ -62,7 +62,7 @@ export function SignInForm() {
             </Button>
             <div className="tw:flex tw:items-center tw:gap-x-2">
               <TMText>New to TM ?</TMText>
-              <Link href="#">
+              <Link href="/auth/register">
                 <Button className="tw:!px-0" variant="text" type="link">
                   Create an account
                 </Button>
