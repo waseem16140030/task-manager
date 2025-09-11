@@ -12,6 +12,8 @@ import {
   updateTask,
   deleteTask,
   getUsersConfig,
+  getServerUserStore,
+  getServerTaskStore,
 } from "@/app/lib";
 import {
   CreateTaskMutationVariables,
@@ -34,6 +36,9 @@ type GraphQLRequestBody<TVariables = Record<string, unknown>> = {
 };
 
 export async function POST(req: Request) {
+  getServerUserStore();
+  getServerTaskStore();
+
   try {
     let body: GraphQLRequestBody;
     try {
@@ -46,7 +51,6 @@ export async function POST(req: Request) {
     }
 
     const { query, variables } = body ?? {};
-    
 
     if (!query) {
       return NextResponse.json(
@@ -116,13 +120,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ data: { register: userWithoutPassword } });
     }
 
-
-     //Get active Users Query
+    //Get active Users Query
     if (query.includes("GetUsersConfig")) {
       const data = await getUsersConfig();
       return NextResponse.json({ data: { usersConfig: data } });
     }
-
 
     //GetUsersList Query
     if (query.includes("GetUsers")) {
@@ -147,8 +149,6 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ data: { editUser: editUserResponse } });
     }
-
-   
 
     //Add Task Mutation
     if (query.includes("CreateTask")) {

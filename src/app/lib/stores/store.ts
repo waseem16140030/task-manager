@@ -1,7 +1,6 @@
-import { useUserStore, generateMockUsers, useTaskStore } from ".";
+import { useUserStore, useTaskStore, generateMockUsers } from ".";
 
 export const getServerUserStore = () => {
-  
   if (typeof window === "undefined") {
     const store = useUserStore.getState();
     if (store.users.length === 0) {
@@ -15,9 +14,8 @@ export const getServerTaskStore = () => {
   if (typeof window === "undefined") {
     const store = useTaskStore.getState();
     if (store.tasks.length === 0) {
-      store.hydrate([]); 
+      store.hydrate([]);
     }
   }
   return useTaskStore.getState();
 };
-
