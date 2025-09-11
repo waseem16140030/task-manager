@@ -15,9 +15,11 @@ export const verifyUserCredentials = async (
   email: string,
   password: string
 ): Promise<User | null> => {
-  const { getUsers } = getServerUserStore();
+  const store = getServerUserStore();
   return (
-    getUsers().find((u) => u.email === email && u.password === password) ?? null
+    store
+      .getUsers()
+      .find((u) => u.email === email && u.password === password) ?? null
   );
 };
 
