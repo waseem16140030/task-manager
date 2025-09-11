@@ -1,8 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Absolutely! Here's a fully formatted `README.md` file that you can copy and paste directly into your project:
+
+````markdown
+# Task Manager - Next.js Project
+
+This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a **Task & User Management System** with JWT authentication, role-based access, and Zustand state management.
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file in the root of your project and add the following:
+
+```env
+NEXT_PUBLIC_API_URL="http://localhost:3000/api/graphql"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="hkHMjjHfNMt23cTTXq+jAlGnnKoAJSl5vUw4JXwcN48="
+````
+
+> **Production**: Update `NEXT_PUBLIC_API_URL` and `NEXTAUTH_URL` to your deployed URL (e.g., Vercel).
+
+---
+
+## Features
+
+### User Management
+
+* Create, update, and delete users
+* Role-based access: `admin`, `user` (superAdmin is hidden from UI)
+* Active/inactive status handling
+* User registration with **password validation**:
+
+  * Minimum 8 characters
+  * At least 1 uppercase letter
+  * At least 1 lowercase letter
+  * At least 1 number
+  * At least 1 special character
+* Fetch user configuration lists (active users)
+* Filter, sort, and paginate user lists
+* Passwords are never exposed in returned data
+
+### Task Management
+
+* Create, update, and delete tasks
+* Filter tasks by status or search keyword
+* Pagination and sorting
+* Timestamps for `createdAt` and `updatedAt`
+* Task statuses: `Backlog`, `In Progress`, `Completed`
+
+### Authentication & Authorization
+
+* JWT-based authentication using **NextAuth.js** with credentials provider
+* Sign-in and sign-out flows
+* Secure session handling with `accessToken` and role info
+* Server-side session retrieval via `getServerAuthSession`
+* SuperAdmin users are excluded from user lists in UI
+
+### State Management
+
+* Global state with **Zustand**
+* Persistence in local storage using `zustand/persist`
+* Server-side hydration for initial state
+* Separate stores for users and tasks
+* Mock initial data for development
+
+### Forms & Validation
+
+* Forms managed via `react-hook-form`
+* Schema validation using `yup`
+* Password, email, and phone validation
+* Custom error messages for required fields
+
+### UI & Components
+
+* Built with **Ant Design**
+* Fully responsive layout
+* Custom components: `InputField`, `PasswordField`, `TMText`, `Button`, etc.
+* Notification system via `useGlobalNotification`
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Clone the repository and install dependencies:
+
+```bash
+git clone <your-repo-url>
+cd <your-project-folder>
+npm install
+# or
+yarn
+# or
+pnpm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -10,27 +101,102 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+You can start editing the project under the `app/` directory. Pages auto-update as you edit.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Lint code
+npm run lint
+```
+
+---
+
+## Project Architecture
+
+```
+app/
+├─ auth/
+│  ├─ signin/
+│  └─ forgot-password/
+├─ dashboard/
+├─ tasks-management/
+├─ users-management/
+lib/
+├─ services/
+│  ├─ auth.ts
+│  ├─ login.ts
+│  ├─ tasks.ts
+│  └─ users.ts
+├─ stores/
+│  ├─ userStore.ts
+│  └─ taskStore.ts
+components/
+├─ InputField.tsx
+├─ PasswordField.tsx
+├─ TMText.tsx
+├─ Button.tsx
+...
+```
+
+* **`lib/services`**: Server-side actions for login, user, and task management.
+* **`lib/stores`**: Zustand stores with `persist` middleware for users and tasks.
+* **`components`**: Reusable UI components with form support and validation.
+* **`app`**: Next.js pages (App Router) for authentication, dashboards, tasks, and users.
+
+---
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the technologies used:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* [Next.js Documentation](https://nextjs.org/docs)
+* [NextAuth.js](https://next-auth.js.org/)
+* [Zustand](https://zustand-demo.pmnd.rs/)
+* [React Hook Form](https://react-hook-form.com/)
+* [Yup Validation](https://github.com/jquense/yup)
+* [Ant Design](https://ant.design/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Deployment on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your project to a Git repository.
+2. Go to [Vercel](https://vercel.com/new) and import your project.
+3. Add the same environment variables (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`) in the Vercel dashboard.
+4. Deploy the project.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Notes
+
+* All mock data (users & tasks) is persisted in local storage for development.
+* SuperAdmin users are **excluded from user lists** in the UI and `getUsersConfig`.
+* JWT tokens are generated locally for demonstration and testing purposes.
+* Form validation ensures consistent and secure user input.
+
+---
+
+## License
+
+This project is open source and available under the MIT License.
+
+```
+
+---
+
+```
