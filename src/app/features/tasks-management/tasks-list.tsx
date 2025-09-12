@@ -55,8 +55,8 @@ export function TasksList() {
   return (
     <Card size="small" variant="borderless" className="tw:h-full">
       <div className="tw:flex tw:flex-col tw:gap-y-4 tw:lg:gap-y-5 tw:md:p-3">
-        <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-[1fr_auto] tw:lg:grid-cols-[0.7fr_auto] tw:gap-4 tw:items-center">
-          <div className="tw:order-2 tw:sm:order-1 tw:flex tw:items-center tw:gap-x-2">
+        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-[1fr_auto] tw:lg:grid-cols-[0.7fr_auto] tw:gap-4 tw:items-center">
+          <div className="tw:order-2 tw:sm:order-1 tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
             <SearchInput
               defaultValue={search}
               placeholder="Search tasks by name..."
@@ -123,14 +123,14 @@ export function TasksList() {
                     >
                       {item.description}
                     </Typography.Paragraph>
-                    <Space>
+                    <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:min-w-0 tw:flex-shrink-0">
                       <CalendarOutlined />
-                      <TMText>{formatDate(item.createdAt)}</TMText>
-                    </Space>
-                    <Space>
+                      <TMText className="tw:truncate">{formatDate(item.createdAt)}</TMText>
+                    </div>
+                    <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:min-w-0 tw:flex-shrink-0">
                       <FormOutlined />
-                      <TMText>{formatDate(item.updatedAt)}</TMText>
-                    </Space>
+                      <TMText className="tw:truncate">{formatDate(item.updatedAt)}</TMText>
+                    </div>
                     {item.assignee && (
                       <>
                         <Divider
@@ -140,7 +140,7 @@ export function TasksList() {
                         />
                         <div className="tw:flex tw:flex-col tw:gap-y-1 tw:min-w-0">
                           <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:flex-shrink-0 tw:min-w-0">
-                            <TMText type="secondary" size="sm">
+                            <TMText className="tw:truncate" type="secondary" size="sm">
                               Name:
                             </TMText>
                             <TMText className="tw:truncate" size="sm">
@@ -148,7 +148,7 @@ export function TasksList() {
                             </TMText>
                           </div>
                           <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:flex-shrink-0 tw:min-w-0">
-                            <TMText type="secondary" size="sm">
+                            <TMText className="tw:truncate" type="secondary" size="sm">
                               Email:
                             </TMText>
                             <TMText className="tw:truncate" size="sm">
