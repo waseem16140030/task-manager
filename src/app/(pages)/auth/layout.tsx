@@ -1,12 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
-import loginImage from "@root/public/login-bg.svg";
-import logoImage from "@root/public/logo.png";
+import Image from 'next/image'
+import Link from 'next/link'
+import loginImage from '@root/public/login-bg.svg'
+import logoImage from '@root/public/logo.png'
 
 export default function AuthLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <div className="tw:grid tw:grid-rows-[auto_1fr] tw:lg:grid-cols-2 tw:min-h-screen">
@@ -36,5 +36,5 @@ export default function AuthLayout({
       </div>
       <div className="tw:self-center tw:justify-items-center">{children}</div>
     </div>
-  );
+  )
 }

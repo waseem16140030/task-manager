@@ -1,4 +1,4 @@
-import { TMText, TMTitle } from "@/app/components";
+import { TMText, TMTitle } from '@/app/components'
 
 export function TasksHeader() {
   return (
@@ -10,5 +10,5 @@ export function TasksHeader() {
         Manage and view user daily tasks.
       </TMText>
     </div>
-  );
+  )
 }

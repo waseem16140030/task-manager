@@ -17,7 +17,6 @@ query GetTasks($pagination: PaginationInput, $filters: TaskFilters) {
   }
 }
 
-
 mutation CreateTask($input: TaskInput!) {
   createTask(input: $input) {
     id

@@ -28,52 +28,59 @@ Password: admin@6Well
 ```
 
 ### Role Rules
-- `superAdmin` and `admin` → Full access, including **User Management**.  
-- `user` → Limited access, cannot see or manage users.  
-- **Registration** (sign-up) always creates a `user` role.  
-- Admins can add users manually (default password = `password@123`).  
+
+- `superAdmin` and `admin` → Full access, including **User Management**.
+- `user` → Limited access, cannot see or manage users.
+- **Registration** (sign-up) always creates a `user` role.
+- Admins can add users manually (default password = `password@123`).
 
 ---
 
 ## Features
 
 ### User Management
-* Only **admin** and **superAdmin** can access User Management.
-* Add, update, activate/deactivate, and delete users.
-* Registration form creates `user` role accounts only.
-* Admin-created users get a default password `password@123` (user can later change).
-* SuperAdmin account is seeded in the database at first initialization.
+
+- Only **admin** and **superAdmin** can access User Management.
+- Add, update, activate/deactivate, and delete users.
+- Registration form creates `user` role accounts only.
+- Admin-created users get a default password `password@123` (user can later change).
+- SuperAdmin account is seeded in the database at first initialization.
 
 ### Task Management
-* Create, update, and delete tasks.
-* Filter tasks by status or search keyword.
-* Pagination and sorting.
-* Timestamps for `createdAt` and `updatedAt`.
-* Task statuses: `Backlog`, `In Progress`, `Completed`.
+
+- Create, update, and delete tasks.
+- Filter tasks by status or search keyword.
+- Pagination and sorting.
+- Timestamps for `createdAt` and `updatedAt`.
+- Task statuses: `Backlog`, `In Progress`, `Completed`.
 
 ### Authentication & Authorization
-* JWT-based authentication using **NextAuth.js** with credentials provider.
-* Role-based route protection (middleware + UI).
-* Redirect rules:
-  * Logged-in `user` cannot access `/` (redirected to `/tasks-management`).
-  * Already logged-in users cannot revisit `/auth/signin`.
+
+- JWT-based authentication using **NextAuth.js** with credentials provider.
+- Role-based route protection (middleware + UI).
+- Redirect rules:
+  - Logged-in `user` cannot access `/` (redirected to `/tasks-management`).
+  - Already logged-in users cannot revisit `/auth/signin`.
 
 ### Persistence
-* Data is stored in a **JSON file** using [lowdb](https://github.com/typicode/lowdb).
-* File: `data/db.json`
-* Persists across sessions like a real database.
+
+- Data is stored in a **JSON file** using [lowdb](https://github.com/typicode/lowdb).
+- File: `data/db.json`
+- Persists across sessions like a real database.
 
 ### Forms & Validation
-* Forms managed via `react-hook-form`.
-* Schema validation using `yup`.
-* Password, email, and phone validation.
-* Custom error messages for required fields.
+
+- Forms managed via `react-hook-form`.
+- Schema validation using `yup`.
+- Password, email, and phone validation.
+- Custom error messages for required fields.
 
 ### UI & Components
-* Built with **Ant Design**.
-* Fully responsive layout.
-* Custom components: `InputField`, `PasswordField`, `TMText`, `Button`, etc.
-* Notification system via `useGlobalNotification`.
+
+- Built with **Ant Design**.
+- Fully responsive layout.
+- Custom components: `InputField`, `PasswordField`, `TMText`, `Button`, etc.
+- Notification system via `useGlobalNotification`.
 
 ---
 
@@ -148,10 +155,10 @@ components/
 ...
 ```
 
-* **`lib/db.ts`** → Initializes lowdb with default SuperAdmin + empty tasks.  
-* **`lib/services`** → Server actions for login, users, and tasks.  
-* **`components`** → Reusable UI components with Ant Design.  
-* **`app`** → Next.js routes for auth, dashboard, tasks, users.
+- **`lib/db.ts`** → Initializes lowdb with default SuperAdmin + empty tasks.
+- **`lib/services`** → Server actions for login, users, and tasks.
+- **`components`** → Reusable UI components with Ant Design.
+- **`app`** → Next.js routes for auth, dashboard, tasks, users.
 
 ---
 
@@ -166,11 +173,11 @@ components/
 
 ## Notes
 
-* Database uses **lowdb** JSON file for persistence.  
-* Only `admin` and `superAdmin` can access User Management.  
-* Registration always creates a `user` role.  
-* Admin-created users start with default password `password@123`.  
-* SuperAdmin account is pre-seeded at startup.  
+- Database uses **lowdb** JSON file for persistence.
+- Only `admin` and `superAdmin` can access User Management.
+- Registration always creates a `user` role.
+- Admin-created users start with default password `password@123`.
+- SuperAdmin account is pre-seeded at startup.
 
 ---
 

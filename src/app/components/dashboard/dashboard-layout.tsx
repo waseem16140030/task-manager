@@ -1,28 +1,19 @@
-"use client";
-import "@ant-design/v5-patch-for-react-19";
-import React, { useEffect } from "react";
-import { Layout } from "antd";
-import {
-  DashboardContent,
-  DashboardFooter,
-  DashboardHeader,
-  DashboardSidebar,
-} from ".";
-import { usePathname } from "next/navigation";
-import { SessionProvider } from "next-auth/react";
+'use client'
+import '@ant-design/v5-patch-for-react-19'
+import React, { useEffect } from 'react'
+import { Layout } from 'antd'
+import { DashboardContent, DashboardFooter, DashboardHeader, DashboardSidebar } from '.'
+import { usePathname } from 'next/navigation'
+import { SessionProvider } from 'next-auth/react'
 
 export interface DashboardLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const pathname = usePathname();
-  const isAuth = pathname.includes("/auth");
-
-
+  const pathname = usePathname()
+  const isAuth = pathname.includes('/auth')
 
   if (isAuth) return <Layout style={{ minHeight: '100vh' }}>{children}</Layout>
-
-
 
   return (
     <SessionProvider>
@@ -35,5 +26,5 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </Layout>
       </Layout>
     </SessionProvider>
-  );
-};
+  )
+}

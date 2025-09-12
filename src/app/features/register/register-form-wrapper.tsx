@@ -1,6 +1,6 @@
-import { TMText, TMTitle } from "@/app/components";
-import { Card, Divider } from "antd";
-import { RegisterForm } from ".";
+import { TMText, TMTitle } from '@/app/components'
+import { Card, Divider } from 'antd'
+import { RegisterForm } from '.'
 
 export function RegisterFormWrapper() {
   return (
@@ -16,5 +16,5 @@ export function RegisterFormWrapper() {
         </div>
       </Card>
     </div>
-  );
+  )
 }

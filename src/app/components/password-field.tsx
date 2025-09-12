@@ -16,7 +16,7 @@ export function PasswordField({ name, ...restProps }: PasswordFieldProps) {
       control={control}
       render={({ field, fieldState: { error } }) => (
         <div className="tw:flex tw:flex-col tw:gap-y-1">
-          <TMPassword  {...restProps} {...field} status={error ? 'error' : undefined} />
+          <TMPassword {...restProps} {...field} status={error ? 'error' : undefined} />
           {error && (
             <Text type="danger" className="tw:!text-sm">
               {error.message}

@@ -1,13 +1,13 @@
 'use client'
-import { Controller, useFormContext } from "react-hook-form";
-import { Select, SelectProps, Typography } from "antd";
+import { Controller, useFormContext } from 'react-hook-form'
+import { Select, SelectProps, Typography } from 'antd'
 export interface CFSelectFieldProps extends SelectProps {
-  name: string;
-  label?: string;
+  name: string
+  label?: string
 }
 export function SelectField({ name, label, size = 'large', ...restProps }: CFSelectFieldProps) {
-  const { control } = useFormContext();
-  const { Text } = Typography;
+  const { control } = useFormContext()
+  const { Text } = Typography
   return (
     <Controller
       name={name}
@@ -19,13 +19,7 @@ export function SelectField({ name, label, size = 'large', ...restProps }: CFSel
               <Text>{label}</Text>
             </label>
           )}
-          <Select
-            size={size}
-            {...restProps}
-            {...field}
-            status={error ? "error" : undefined}
-
-          />
+          <Select size={size} {...restProps} {...field} status={error ? 'error' : undefined} />
           {error && (
             <Text type="danger" className="tw:!text-sm">
               {error.message}
@@ -34,5 +28,5 @@ export function SelectField({ name, label, size = 'large', ...restProps }: CFSel
         </div>
       )}
     />
-  );
+  )
 }

@@ -1,19 +1,15 @@
-import type { CodegenConfig } from "@graphql-codegen/cli";
+import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  schema: "src/graphql/schema.graphql",
-  documents: ["src/**/*.graphql"],
+  schema: 'src/graphql/schema.graphql',
+  documents: ['src/**/*.graphql'],
   generates: {
-    "src/graphql/generated/graphql.ts": {
-      plugins: [
-        "typescript",
-        "typescript-operations",
-        "typescript-react-query",
-      ],
+    'src/graphql/generated/graphql.ts': {
+      plugins: ['typescript', 'typescript-operations', 'typescript-react-query'],
       config: {
         fetcher: {
-         func: "@/app/lib/customFetcher#customFetcher",
-         isReactHook: false
+          func: '@/app/lib/customFetcher#customFetcher',
+          isReactHook: false,
         },
         legacyMode: false,
         exposeQueryKeys: true,
@@ -24,8 +20,8 @@ const config: CodegenConfig = {
     },
   },
   hooks: {
-    afterAllFileWrite: ["prettier --write"],
+    afterAllFileWrite: ['prettier --write'],
   },
-};
+}
 
-export default config;
+export default config
