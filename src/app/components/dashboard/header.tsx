@@ -6,6 +6,7 @@ import { EditOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { SearchInput } from '@/app/components'
 import { cleanup } from '@/app/lib'
 import { signOut, useSession } from 'next-auth/react'
+import { usePusher } from '@/app/shared/utils'
 
 export function DashboardHeader() {
   const { token } = theme.useToken()
@@ -65,6 +66,8 @@ export function DashboardHeader() {
       handleLogout()
     }
   }
+
+  usePusher(user?.id ?? '')
 
   return (
     <Header
