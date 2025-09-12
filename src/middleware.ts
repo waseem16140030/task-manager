@@ -1,9 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-const AUTH_ROUTES = ["/auth", "/auth/signin", "/auth/signup"];
-const PUBLIC_ROUTES = ["/about", "/privacy"];
-const RESET_ROUTES = ["/auth/reset-password", "/auth/reset-password/success"];
+const AUTH_ROUTES = ["/auth", "/auth/signin", "/auth/register"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,15 +10,19 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  const role = token?.role;
   const isAuthenticated = !!token;
   const isLoginRoute = pathname === "/auth/signin";
-  const isPublicRoute =
-    PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) ||
-    AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isPublicRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   // Redirect to home if already logged in but visiting login page
   if (isAuthenticated && isLoginRoute) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Block "/" for users with role === "user"
+  if (pathname === "/" && role === "user") {
+    return NextResponse.redirect(new URL("/tasks-management", request.url));
   }
 
   // Allow public/auth routes
@@ -28,10 +30,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow reset-password routes without auth
-  if (RESET_ROUTES.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
 
   // Redirect to signin if not authenticated
   if (!isAuthenticated) {

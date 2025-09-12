@@ -1,4 +1,4 @@
-import { getServerTaskStore, getServerUserStore } from "@/app/lib/stores";
+'use server'
 import {
   GetTasksQuery,
   GetTasksQueryVariables,
@@ -11,19 +11,21 @@ import {
   UserConfig,
 } from "@/graphql/generated/graphql";
 
+import { db, initializeDB } from "@/app/lib/db";
+
+//Login Handler
 export const verifyUserCredentials = async (
   email: string,
   password: string
 ): Promise<User | null> => {
-  const store = getServerUserStore();
+  await initializeDB();
   return (
-    store
-      .getUsers()
-      .find((u) => u.email === email && u.password === password) ?? null
+    db.data?.users.find((u) => u.email === email && u.password === password) ??
+    null
   );
 };
 
-export const generateJWT = (user: User): string => {
+export const generateJWT = async (user: User): Promise<string> => {
   const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const payload = btoa(
     JSON.stringify({
@@ -32,76 +34,76 @@ export const generateJWT = (user: User): string => {
       email: user.email,
       role: user.role,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 86400, // 24h
+      exp: Math.floor(Date.now() / 1000) + 86400,
     })
   );
   return `${header}.${payload}.${btoa("mock-signature")}`;
 };
 
+//Create User Handler
 export const createUser = async (user: User): Promise<User> => {
-  const { password, registrationDate, ...restUser } = user;
-  const { addUser } = getServerUserStore();
-  addUser({
-    ...restUser,
-    password: password ?? "password@123",
-    registrationDate: registrationDate ?? Date.now().toString(),
-  });
-  return user;
+  await initializeDB();
+  const newUser: User = {
+    ...user,
+    password: user.password ?? "password@123",
+    registrationDate: user.registrationDate ?? new Date().toISOString(),
+  };
+  db.data!.users.push(newUser);
+  await db.write();
+  return newUser;
 };
 
+//Get Active Users Handler
 export const getUsersConfig = async (): Promise<UserConfig[]> => {
-  const { getUsers } = getServerUserStore();
-  const activeUsers: UserConfig[] = getUsers()
-    .filter((u) => u.status === "active" && u.role !== "superAdmin")
-    .map(({ id, name }) => ({ id, name }));
-
-  return activeUsers;
+  await initializeDB();
+  return (
+    db.data?.users
+      .filter((u) => u.status === "active" && u.role !== "superAdmin")
+      .map(({ id, name }) => ({ id, name })) ?? []
+  );
 };
 
+//get user by id Handler
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const { getUsers } = getServerUserStore();
-  return getUsers().find((u) => u.email === email) ?? null;
+  await initializeDB();
+  return db.data?.users.find((u) => u.email === email) ?? null;
 };
 
+//Delete user Handler
 export const deleteUser = async (id: string): Promise<boolean> => {
-  const { getUsers, removeUserById } = getServerUserStore();
-  const exists = getUsers().some((u) => u.id === id);
+  await initializeDB();
+  const idx = db.data!.users.findIndex((u) => u.id === id);
+  if (idx === -1) return false;
 
-  if (!exists) {
-    return false;
-  }
-
-  removeUserById(id);
+  db.data!.users.splice(idx, 1);
+  await db.write();
   return true;
 };
 
+//Edit user Handler
 export const editUserById = async (
   id: string,
   updates: Partial<User>
 ): Promise<User | null> => {
-  const { getUsers, updateUserById } = getServerUserStore();
-  const existingUser = getUsers().find((u) => u.id === id);
+  await initializeDB();
+  const user = db.data!.users.find((u) => u.id === id);
+  if (!user) return null;
 
-  if (!existingUser) {
-    return null;
-  }
+  Object.assign(user, updates);
+  await db.write();
 
-  // apply updates
-  updateUserById(id, updates);
-
-  // return updated user without password
-  const updatedUser = { ...existingUser, ...updates };
-  const { password, ...safeUser } = updatedUser;
+  const { password, ...safeUser } = user;
   return safeUser;
 };
 
+//Get users List Handler
 export const getUsersList = async (
   variables: GetUsersQueryVariables
 ): Promise<GetUsersQuery["users"]> => {
-  const { getUsers } = getServerUserStore();
-  let users = getUsers().filter((u) => u.role !== "superAdmin");
+  await initializeDB();
+  let users = db.data!.users.filter((u) => u.role !== "superAdmin");
 
-  // 1. Apply filters
+  // 1. Filters
   const { role, email, status } = variables?.filters ?? {};
   if (role) users = users.filter((u) => u.role === role);
   if (email)
@@ -110,18 +112,7 @@ export const getUsersList = async (
     );
   if (status) users = users.filter((u) => u.status === status);
 
-  if (users.length === 0) {
-    return {
-      data: [],
-      metadata: {
-        total: 0,
-        page: 1,
-        pageSize: variables.pagination?.pageSize ?? 10,
-      },
-    };
-  }
-
-  // 2. Apply sorting
+  // 2. Sorting
   if (variables?.sort?.field && variables?.sort?.order) {
     const { field, order } = variables.sort;
     const direction = order.toLowerCase() === "asc" ? 1 : -1;
@@ -151,7 +142,7 @@ export const getUsersList = async (
     });
   }
 
-  // 3. Apply pagination
+  // 3. Pagination
   const total = users.length;
   const page = variables?.pagination?.page ?? 1;
   const pageSize = variables?.pagination?.pageSize ?? 10;
@@ -170,8 +161,9 @@ export const getUsersList = async (
   };
 };
 
+//Create Task Handler
 export const createTask = async (task: TaskInput): Promise<Task> => {
-  const { addTask } = getServerTaskStore();
+  await initializeDB();
   const newTask: Task = {
     ...task,
     id: `task-${Date.now()}`,
@@ -179,15 +171,17 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
     updatedAt: new Date().toISOString(),
     status: TaskStatus.Backlog,
   };
-  addTask(newTask);
+  db.data!.tasks.push(newTask);
+  await db.write();
   return newTask;
 };
 
+//Get Tasks List Handler
 export const getTasksList = async (
   variables: GetTasksQueryVariables
 ): Promise<GetTasksQuery["tasks"]> => {
-  const { getTasks } = getServerTaskStore();
-  let tasks: Task[] = getTasks();
+  await initializeDB();
+  let tasks = db.data!.tasks;
 
   // Filters
   const status = variables?.filters?.status;
@@ -197,7 +191,6 @@ export const getTasksList = async (
   if (status) {
     tasks = tasks.filter((t) => t.status === status);
   }
-
   if (search) {
     tasks = tasks.filter((t) => {
       const title = (t.title ?? "").toLowerCase();
@@ -223,23 +216,27 @@ export const getTasksList = async (
   };
 };
 
+//Update Task Handler
 export const updateTask = async (
   id: string,
   updates: Partial<Task>
 ): Promise<Task | null> => {
-  const { getTasks, updateTaskById } = getServerTaskStore();
-  const existing = getTasks().find((t) => t.id === id);
-  if (!existing) return null;
+  await initializeDB();
+  const task = db.data!.tasks.find((t) => t.id === id);
+  if (!task) return null;
 
-  updateTaskById(id, updates);
-  return { ...existing, ...updates };
+  Object.assign(task, updates, { updatedAt: new Date().toISOString() });
+  await db.write();
+  return task;
 };
 
+//Delete Task Handler
 export const deleteTask = async (id: string): Promise<boolean> => {
-  const { getTasks, removeTaskById } = getServerTaskStore();
-  const exists = getTasks().some((t) => t.id === id);
-  if (!exists) return false;
+  await initializeDB();
+  const idx = db.data!.tasks.findIndex((t) => t.id === id);
+  if (idx === -1) return false;
 
-  removeTaskById(id);
+  db.data!.tasks.splice(idx, 1);
+  await db.write();
   return true;
 };

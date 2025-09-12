@@ -1,6 +1,6 @@
 "use client";
 import { Layout, Menu, MenuProps, theme } from "antd";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   BarChartOutlined,
   BellOutlined,
@@ -17,12 +17,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import logoImg from '@root/public/logo.png'
+import { useSession } from "next-auth/react";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { push } = useRouter();
   const { token } = theme.useToken();
   const { Sider } = Layout;
+  const { data: session } = useSession();
+  const role = session?.user?.role 
 
   const siderStyle: React.CSSProperties = {
     insetInlineStart: 0,
@@ -32,45 +35,60 @@ export function DashboardSidebar() {
     borderColor: token.colorBorder,
   };
 
-  const items: MenuProps["items"] = [
-    {
-      key: routeKey.USERS_MANAGEMENT,
-      label: "User Management",
-      icon: <UsergroupAddOutlined />,
-    },
-    {
-      key: routeKey.TASKS,
-      label: "Tasks Management",
-      icon: <ScheduleOutlined /> ,
-    },
-    {
-      key: routeKey.PUSH_NOTIFICATIONS,
-      label: "Push Notifications",
-      icon: <BellOutlined />,
-    },
-    {
-      key: routeKey.EMAIL_SYSTEM,
-      label: "Email System",
-      icon: <MessageOutlined />,
-    },
-    {
-      key: routeKey.SUBSCRIPTIONS,
-      label: "Subscriptions",
-      icon: <CreditCardOutlined />,
-    },
-    {
-      key: routeKey.TEAM_ACCESS,
-      label: "Team Access",
-      icon: <SecurityScanOutlined />,
-    },
-    { key: routeKey.ANALYTICS, label: "Analytics", icon: <BarChartOutlined /> },
-    {
-      key: routeKey.USER_SUPPORT,
-      label: "User Support",
-      icon: <NotificationOutlined />,
-    },
-    { key: routeKey.SETTINGS, label: "Settings", icon: <SettingOutlined /> },
-  ];
+ const items: MenuProps["items"] = useMemo(() => {
+    const baseItems: MenuProps["items"] = [
+      {
+        key: routeKey.TASKS,
+        label: "Tasks Management",
+        icon: <ScheduleOutlined />,
+      },
+      {
+        key: routeKey.PUSH_NOTIFICATIONS,
+        label: "Push Notifications",
+        icon: <BellOutlined />,
+      },
+      {
+        key: routeKey.EMAIL_SYSTEM,
+        label: "Email System",
+        icon: <MessageOutlined />,
+      },
+      {
+        key: routeKey.SUBSCRIPTIONS,
+        label: "Subscriptions",
+        icon: <CreditCardOutlined />,
+      },
+      {
+        key: routeKey.TEAM_ACCESS,
+        label: "Team Access",
+        icon: <SecurityScanOutlined />,
+      },
+      {
+        key: routeKey.ANALYTICS,
+        label: "Analytics",
+        icon: <BarChartOutlined />,
+      },
+      {
+        key: routeKey.USER_SUPPORT,
+        label: "User Support",
+        icon: <NotificationOutlined />,
+      },
+      {
+        key: routeKey.SETTINGS,
+        label: "Settings",
+        icon: <SettingOutlined />,
+      },
+    ];
+
+    if (role !== "user") {
+      baseItems.unshift({
+        key: routeKey.USERS_MANAGEMENT,
+        label: "User Management",
+        icon: <UsergroupAddOutlined />,
+      });
+    }
+
+    return baseItems;
+  }, [role]);
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     push(key);

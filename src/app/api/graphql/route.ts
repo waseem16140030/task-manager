@@ -12,8 +12,6 @@ import {
   updateTask,
   deleteTask,
   getUsersConfig,
-  getServerUserStore,
-  getServerTaskStore,
 } from "@/app/lib";
 import {
   CreateTaskMutationVariables,
@@ -36,9 +34,6 @@ type GraphQLRequestBody<TVariables = Record<string, unknown>> = {
 };
 
 export async function POST(req: Request) {
-  getServerUserStore();
-  getServerTaskStore();
-
   try {
     let body: GraphQLRequestBody;
     try {
@@ -85,7 +80,7 @@ export async function POST(req: Request) {
         );
       }
 
-      const token = generateJWT(user);
+      const token = await generateJWT(user);
       const { password: _, ...userWithoutPassword } = user;
 
       return NextResponse.json({
