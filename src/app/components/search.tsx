@@ -4,15 +4,15 @@ import { SearchOutlined } from '@ant-design/icons'
 import { debounce } from 'lodash'
 import { useMemo, useCallback, useEffect, useRef } from 'react'
 
-export function SearchInput({ 
-  onChange, 
-  debounceDelay = 500, 
-  ...restProps 
+export function SearchInput({
+  onChange,
+  debounceDelay = 500,
+  ...restProps
 }: InputProps & { debounceDelay?: number }) {
   const { token } = theme.useToken()
-  
+
   const onChangeRef = useRef(onChange)
-  
+
   useEffect(() => {
     onChangeRef.current = onChange
   }, [onChange])
@@ -23,17 +23,19 @@ export function SearchInput({
     }, debounceDelay)
   }, [debounceDelay])
 
- 
   useEffect(() => {
     return () => {
       debouncedOnChange.cancel()
     }
   }, [debouncedOnChange])
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    e.persist()
-    debouncedOnChange(e)
-  }, [debouncedOnChange])
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.persist()
+      debouncedOnChange(e)
+    },
+    [debouncedOnChange],
+  )
 
   return (
     <Input

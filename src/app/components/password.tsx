@@ -21,13 +21,7 @@ export function TMPassword({
             <Text>{label}</Text>
           </label>
         )}
-        <Password
-          id={name}
-          name={name}
-          size={size}
-          className={clsx(className)}
-          {...restProps}
-        />
+        <Password id={name} name={name} size={size} className={clsx(className)} {...restProps} />
       </div>
     </div>
   )

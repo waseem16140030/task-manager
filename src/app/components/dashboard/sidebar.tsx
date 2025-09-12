@@ -1,6 +1,6 @@
-"use client";
-import { Layout, Menu, MenuProps, theme } from "antd";
-import React, { useMemo } from "react";
+'use client'
+import { Layout, Menu, MenuProps, theme } from 'antd'
+import React, { useMemo } from 'react'
 import {
   BarChartOutlined,
   BellOutlined,
@@ -11,88 +11,88 @@ import {
   SecurityScanOutlined,
   SettingOutlined,
   UsergroupAddOutlined,
-} from "@ant-design/icons";
-import { routeKey } from "@/app/config";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+} from '@ant-design/icons'
+import { routeKey } from '@/app/config'
+import Link from 'next/link'
+import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
 import logoImg from '@root/public/logo.png'
-import { useSession } from "next-auth/react";
+import { useSession } from 'next-auth/react'
 
 export function DashboardSidebar() {
-  const pathname = usePathname();
-  const { push } = useRouter();
-  const { token } = theme.useToken();
-  const { Sider } = Layout;
-  const { data: session } = useSession();
-  const role = session?.user?.role 
+  const pathname = usePathname()
+  const { push } = useRouter()
+  const { token } = theme.useToken()
+  const { Sider } = Layout
+  const { data: session } = useSession()
+  const role = session?.user?.role
 
   const siderStyle: React.CSSProperties = {
     insetInlineStart: 0,
-    scrollbarWidth: "thin",
-    scrollbarGutter: "stable",
+    scrollbarWidth: 'thin',
+    scrollbarGutter: 'stable',
     backgroundColor: token.colorBgContainer,
     borderColor: token.colorBorder,
-  };
+  }
 
- const items: MenuProps["items"] = useMemo(() => {
-    const baseItems: MenuProps["items"] = [
+  const items: MenuProps['items'] = useMemo(() => {
+    const baseItems: MenuProps['items'] = [
       {
         key: routeKey.TASKS,
-        label: "Tasks Management",
+        label: 'Tasks Management',
         icon: <ScheduleOutlined />,
       },
       {
         key: routeKey.PUSH_NOTIFICATIONS,
-        label: "Push Notifications",
+        label: 'Push Notifications',
         icon: <BellOutlined />,
       },
       {
         key: routeKey.EMAIL_SYSTEM,
-        label: "Email System",
+        label: 'Email System',
         icon: <MessageOutlined />,
       },
       {
         key: routeKey.SUBSCRIPTIONS,
-        label: "Subscriptions",
+        label: 'Subscriptions',
         icon: <CreditCardOutlined />,
       },
       {
         key: routeKey.TEAM_ACCESS,
-        label: "Team Access",
+        label: 'Team Access',
         icon: <SecurityScanOutlined />,
       },
       {
         key: routeKey.ANALYTICS,
-        label: "Analytics",
+        label: 'Analytics',
         icon: <BarChartOutlined />,
       },
       {
         key: routeKey.USER_SUPPORT,
-        label: "User Support",
+        label: 'User Support',
         icon: <NotificationOutlined />,
       },
       {
         key: routeKey.SETTINGS,
-        label: "Settings",
+        label: 'Settings',
         icon: <SettingOutlined />,
       },
-    ];
+    ]
 
-    if (role !== "user") {
+    if (role !== 'user') {
       baseItems.unshift({
         key: routeKey.USERS_MANAGEMENT,
-        label: "User Management",
+        label: 'User Management',
         icon: <UsergroupAddOutlined />,
-      });
+      })
     }
 
-    return baseItems;
-  }, [role]);
+    return baseItems
+  }, [role])
 
-  const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
-    push(key);
-  };
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    push(key)
+  }
 
   return (
     <Sider
@@ -108,7 +108,14 @@ export function DashboardSidebar() {
         }}
       >
         <Link href={routeKey.USERS_MANAGEMENT}>
-          <Image src={logoImg} alt="Task Manager Icon" height={60} width={120} className="tw:max-w-full" priority={false} />
+          <Image
+            src={logoImg}
+            alt="Task Manager Icon"
+            height={60}
+            width={120}
+            className="tw:max-w-full"
+            priority={false}
+          />
         </Link>
       </div>
       <Menu
@@ -120,5 +127,5 @@ export function DashboardSidebar() {
         items={items}
       />
     </Sider>
-  );
+  )
 }

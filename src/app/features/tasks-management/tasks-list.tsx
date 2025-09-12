@@ -1,11 +1,15 @@
-"use client";
-import { SearchInput } from "@/app/components";
-import { usePaginatedQueryParams } from "@/app/shared/utils";
-import { Badge, Card, List, Select, Typography } from "antd";
-import { AddTask, DeleteTask, EditTask, UpdateTaskStatus } from ".";
-import { useQuery } from "@tanstack/react-query";
-import { useGetTasksQuery } from "@/graphql/generated/graphql";
-import { statusColorMap, statusTitleMap, useTaskStatusOptions } from "@/app/shared/utils/hooks/useTasks";
+'use client'
+import { SearchInput } from '@/app/components'
+import { usePaginatedQueryParams } from '@/app/shared/utils'
+import { Badge, Card, List, Select, Typography } from 'antd'
+import { AddTask, DeleteTask, EditTask, UpdateTaskStatus } from '.'
+import { useQuery } from '@tanstack/react-query'
+import { useGetTasksQuery } from '@/graphql/generated/graphql'
+import {
+  statusColorMap,
+  statusTitleMap,
+  useTaskStatusOptions,
+} from '@/app/shared/utils/hooks/useTasks'
 
 export function TasksList() {
   const {
@@ -16,30 +20,29 @@ export function TasksList() {
     current,
     pageSize,
     selectedFilters,
-  } = usePaginatedQueryParams({ filterKeys: ["status"] });
-  const options = useTaskStatusOptions();
+  } = usePaginatedQueryParams({ filterKeys: ['status'] })
+  const options = useTaskStatusOptions()
 
   const queryKey = useGetTasksQuery.getKey({
     filters: {
       search,
       status: selectedFilters.status,
     },
-  });
+  })
   const queryFn = useGetTasksQuery.fetcher({
     filters: {
       search,
       status: selectedFilters.status,
     },
-  });
+  })
 
   const { data: tasksData, isLoading } = useQuery({
     queryKey,
     queryFn,
-  });
+  })
 
-  const { tasks } = tasksData ?? {};
-  const { data, metadata } = tasks ?? {};
-
+  const { tasks } = tasksData ?? {}
+  const { data, metadata } = tasks ?? {}
 
   return (
     <Card size="small" variant="borderless" className="tw:h-full">
@@ -55,7 +58,7 @@ export function TasksList() {
               showSearch
               options={options}
               defaultValue={selectedFilters?.status}
-              onChange={(value) => handleSelectChange("status", value)}
+              onChange={(value) => handleSelectChange('status', value)}
               allowClear
               className="tw:sm:w-60"
               placeholder="Select status"
@@ -112,5 +115,5 @@ export function TasksList() {
         />
       </div>
     </Card>
-  );
+  )
 }

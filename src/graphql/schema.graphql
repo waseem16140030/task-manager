@@ -75,11 +75,7 @@ input EditUserInput {
 }
 
 type Query {
-  users(
-    pagination: PaginationInput
-    filters: UserFilters
-    sort: SortInput
-  ): UsersResponse!
+  users(pagination: PaginationInput, filters: UserFilters, sort: SortInput): UsersResponse!
   me: User
 }
 
@@ -117,7 +113,7 @@ type Task {
   assignee: User
   createdAt: String!
   updatedAt: String!
-  assigneeId:String
+  assigneeId: String
 }
 
 input TaskInput {

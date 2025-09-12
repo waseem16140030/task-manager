@@ -1,12 +1,11 @@
-import { UsersHeader, UsersList } from "@/app/features";
-import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { Skeleton } from "antd";
-import { Suspense } from "react";
-import { Hydrate } from "./providers";
-import { useGetUsersQuery } from "@/graphql/generated/graphql";
+import { UsersHeader, UsersList } from '@/app/features'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
+import { Suspense } from 'react'
+import { Hydrate } from './providers'
+import { useGetUsersQuery } from '@/graphql/generated/graphql'
 
 export default async function UserManagement() {
-
   const queryClient = new QueryClient()
 
   await queryClient.prefetchQuery({
@@ -35,5 +34,5 @@ export default async function UserManagement() {
         </Hydrate>
       </Suspense>
     </div>
-  );
+  )
 }
