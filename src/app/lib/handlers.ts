@@ -167,7 +167,7 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
   return newTask
 }
 
-//Get Tasks List Handler
+// Get Tasks List Handler
 export const getTasksList = async (
   variables: GetTasksQueryVariables,
 ): Promise<GetTasksQuery['tasks']> => {
@@ -175,13 +175,17 @@ export const getTasksList = async (
   let tasks = db.data!.tasks
 
   // Filters
-  const status = variables?.filters?.status
-  const searchRaw = variables?.filters?.search
+  const { status, search: searchRaw, assignee } = variables?.filters ?? {}
   const search = searchRaw?.trim().toLowerCase()
 
   if (status) {
     tasks = tasks.filter((t) => t.status === status)
   }
+
+  if (assignee) {
+    tasks = tasks.filter((t) => t.assigneeId === assignee)
+  }
+
   if (search) {
     tasks = tasks.filter((t) => {
       const title = (t.title ?? '').toLowerCase()
@@ -197,8 +201,25 @@ export const getTasksList = async (
   const start = Math.max(0, (page - 1) * pageSize)
   const paginated = tasks.slice(start, start + pageSize)
 
+  // Attach assignee object
+  const enrichedTasks = paginated.map((task) => {
+    const assigneeUser = db.data?.users.find((u) => u.id === task.assigneeId) || null
+
+    return {
+      ...task,
+      assignee: assigneeUser
+        ? {
+            id: assigneeUser.id,
+            name: assigneeUser.name,
+            email: assigneeUser.email,
+            role: assigneeUser.role,
+          }
+        : null,
+    }
+  })
+
   return {
-    data: paginated,
+    data: enrichedTasks,
     metadata: {
       total,
       page,

@@ -8,6 +8,12 @@ query GetTasks($pagination: PaginationInput, $filters: TaskFilters) {
       createdAt
       updatedAt
       assigneeId
+      assignee {
+        id
+        name
+        email
+        role
+      }
     }
     metadata {
       total

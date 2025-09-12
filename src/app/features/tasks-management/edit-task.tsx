@@ -83,7 +83,6 @@ function EditTaskModal({ modalRef, taskData }: EditTaskModalProps) {
       id,
       input: {
         ...data,
-        ...taskData,
       },
     })
   }

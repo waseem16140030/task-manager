@@ -71,7 +71,9 @@ function AddTaskModal({ modalRef }: AddTaskModalProps) {
 
   const handleAddTask = async (data: TaskInput) => {
     await createNewTaskFn({
-      input: data,
+      input: {
+        ...data,
+      },
     })
   }
 

@@ -1,15 +1,16 @@
 'use client'
-import { SearchInput } from '@/app/components'
-import { usePaginatedQueryParams } from '@/app/shared/utils'
-import { Badge, Card, List, Select, Typography } from 'antd'
+import { SearchInput, TMText } from '@/app/components'
+import { formatDate, usePaginatedQueryParams } from '@/app/shared/utils'
+import { Badge, Card, Divider, List, Select, Space, Typography } from 'antd'
 import { AddTask, DeleteTask, EditTask, UpdateTaskStatus } from '.'
 import { useQuery } from '@tanstack/react-query'
-import { useGetTasksQuery } from '@/graphql/generated/graphql'
+import { useGetTasksQuery, useGetUsersConfigQuery } from '@/graphql/generated/graphql'
 import {
   statusColorMap,
   statusTitleMap,
   useTaskStatusOptions,
 } from '@/app/shared/utils/hooks/useTasks'
+import { CalendarOutlined, FormOutlined } from '@ant-design/icons'
 
 export function TasksList() {
   const {
@@ -20,19 +21,26 @@ export function TasksList() {
     current,
     pageSize,
     selectedFilters,
-  } = usePaginatedQueryParams({ filterKeys: ['status'] })
+  } = usePaginatedQueryParams({ filterKeys: ['status', 'assignee'] })
   const options = useTaskStatusOptions()
+
+  const { data: activeUsers } = useQuery({
+    queryKey: useGetUsersConfigQuery.getKey(),
+    queryFn: useGetUsersConfigQuery.fetcher(),
+  })
 
   const queryKey = useGetTasksQuery.getKey({
     filters: {
       search,
-      status: selectedFilters.status,
+      status: selectedFilters?.status,
+      assignee: selectedFilters?.assignee,
     },
   })
   const queryFn = useGetTasksQuery.fetcher({
     filters: {
       search,
       status: selectedFilters.status,
+      assignee: selectedFilters?.assignee,
     },
   })
 
@@ -64,6 +72,20 @@ export function TasksList() {
               placeholder="Select status"
               size="large"
             />
+            <Select
+              options={activeUsers?.usersConfig}
+              fieldNames={{
+                value: 'id',
+                label: 'name',
+              }}
+              defaultValue={selectedFilters?.assignee}
+              onChange={(value) => handleSelectChange('assignee', value)}
+              showSearch
+              allowClear
+              className="tw:sm:w-60"
+              placeholder="Select Assignee"
+              size="large"
+            />
           </div>
           <div className="tw:order-1 tw:justify-self-end tw:sm:order-2">
             <AddTask />
@@ -91,16 +113,51 @@ export function TasksList() {
                     <UpdateTaskStatus key="update-status" taskData={item} />,
                   ]}
                   title={item.title}
-                  className="tw:h-62"
+                  className="tw:h-85"
                 >
                   <div className="tw:flex tw:flex-col tw:gap-y-1.5 tw:min-h-20">
                     <Typography.Paragraph
                       ellipsis={{
-                        rows: 3,
+                        rows: 2,
                       }}
                     >
                       {item.description}
                     </Typography.Paragraph>
+                    <Space>
+                      <CalendarOutlined />
+                      <TMText>{formatDate(item.createdAt)}</TMText>
+                    </Space>
+                    <Space>
+                      <FormOutlined />
+                      <TMText>{formatDate(item.updatedAt)}</TMText>
+                    </Space>
+                    {item.assignee && (
+                      <>
+                        <Divider
+                          style={{
+                            marginBlock: 4,
+                          }}
+                        />
+                        <div className="tw:flex tw:flex-col tw:gap-y-1 tw:min-w-0">
+                          <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:flex-shrink-0 tw:min-w-0">
+                            <TMText type="secondary" size="sm">
+                              Name:
+                            </TMText>
+                            <TMText className="tw:truncate" size="sm">
+                              {item.assignee?.name}
+                            </TMText>
+                          </div>
+                          <div className="tw:flex tw:items-center tw:gap-x-1.5 tw:flex-shrink-0 tw:min-w-0">
+                            <TMText type="secondary" size="sm">
+                              Email:
+                            </TMText>
+                            <TMText className="tw:truncate" size="sm">
+                              {item.assignee?.email}
+                            </TMText>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Card>
               </Badge.Ribbon>

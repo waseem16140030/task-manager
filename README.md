@@ -1,5 +1,3 @@
-Here’s your updated **`README.md`** with **GitHub Workflows** section included. I formatted it cleanly so you can just copy-paste:
-
 ````markdown
 # Task Manager - Next.js Project
 

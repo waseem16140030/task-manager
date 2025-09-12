@@ -2,7 +2,7 @@
 import { useGlobalNotification } from '@/app/providers'
 import { useTaskStatusOptions } from '@/app/shared/utils/hooks/useTasks'
 import { Task, useGetTasksQuery, useUpdateTaskMutation } from '@/graphql/generated/graphql'
-import { SettingOutlined } from '@ant-design/icons'
+import { HistoryOutlined, SettingOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { Dropdown, MenuProps } from 'antd'
 
@@ -61,7 +61,7 @@ export function UpdateTaskStatus({ taskData }: UpdateTaskStatusProps) {
         onClick: handleUpdateStatus,
       }}
     >
-      <SettingOutlined
+      <HistoryOutlined
         spin={isPending}
         style={{
           fontSize: 18,
