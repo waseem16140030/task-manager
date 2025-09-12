@@ -72,7 +72,7 @@ export function DashboardHeader() {
       className="tw:!px-3 tw:md:!px-4 tw:lg:!px-6 tw:xl:!px-7 tw:!border-b-1"
     >
       <div className="tw:flex tw:items-center tw:justify-between tw:gap-x-4 tw:w-full">
-        <div className="tw:w-1/4">
+        <div className="tw:w-4xl tw:md:w-1/4">
           <SearchInput placeholder="Search..." />
         </div>
         <div className="tw:flex tw:items-center tw:gap-x-2">

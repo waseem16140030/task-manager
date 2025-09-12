@@ -21,7 +21,10 @@ export function TasksList() {
     current,
     pageSize,
     selectedFilters,
-  } = usePaginatedQueryParams({ filterKeys: ['status', 'assignee'] })
+  } = usePaginatedQueryParams({
+    filterKeys: ['status', 'assignee'],
+    defaultValues: { pageSize: 8 },
+  })
   const options = useTaskStatusOptions()
 
   const { data: activeUsers } = useQuery({
@@ -56,7 +59,7 @@ export function TasksList() {
     <Card size="small" variant="borderless" className="tw:h-full">
       <div className="tw:flex tw:flex-col tw:gap-y-4 tw:lg:gap-y-5 tw:md:p-3">
         <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-[1fr_auto] tw:lg:grid-cols-[0.7fr_auto] tw:gap-4 tw:items-center">
-          <div className="tw:order-2 tw:sm:order-1 tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
+          <div className="tw:order-2 tw:sm:order-1 tw:flex tw:items-center tw:gap-2 tw:flex-wrap tw:md:flex-nowrap">
             <SearchInput
               defaultValue={search}
               placeholder="Search tasks by name..."
