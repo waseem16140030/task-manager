@@ -22,7 +22,7 @@ export async function loginAction(credentials: {
     }
 
     // generate token with your util
-    const token = generateJWT(user);
+    const token = await generateJWT(user);
 
     // return the user without password
     const { password, ...safeUser } = user as User & { password?: string };

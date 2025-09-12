@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
             const { token, user } = userResponse ?? {};
             return {
               id: user.id ?? "",
-              accessToken: token,
+              accessToken: token ?? "",
               name: user.name ?? "",
               email: user.email ?? "",
               role: user.role ?? "",
@@ -67,8 +67,8 @@ export const authOptions: NextAuthOptions = {
             };
           }
           return null;
-        } catch  {
-           return null;
+        } catch {
+          return null;
         }
       },
     }),

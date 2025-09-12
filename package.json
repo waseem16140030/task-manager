@@ -7,7 +7,20 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
+    "typecheck": "tsc --pretty --skipLibCheck --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fix": "yarn lint:fix && yarn format",
     "codegen": "graphql-codegen --config codegen.ts --watch"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "yarn lint:fix"
+    ],
+    "**/*.{js,ts,tsx,json,css,md}": [
+      "yarn format"
+    ]
   },
   "dependencies": {
     "@ant-design/icons": "5.x",
@@ -45,6 +58,10 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9",
+    "lint-staged": "15.2.2"
   }
 }
