@@ -179,7 +179,6 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
   return newTask
 }
 
-// Get Tasks List Handler
 export const getTasksList = async (
   variables: GetTasksQueryVariables,
 ): Promise<GetTasksQuery['tasks']> => {
@@ -205,6 +204,13 @@ export const getTasksList = async (
       return title.includes(search) || desc.includes(search)
     })
   }
+
+  // Sort by creation date descending (newest first)
+  tasks.sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime()
+    const dateB = new Date(b.createdAt).getTime()
+    return dateB - dateA
+  })
 
   // Pagination
   const total = tasks.length
