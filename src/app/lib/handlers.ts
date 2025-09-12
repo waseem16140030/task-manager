@@ -11,15 +11,15 @@ import {
   UserConfig,
 } from '@/graphql/generated/graphql'
 
-import { db, initializeDB } from '@/app/lib/db'
+import { db } from '@/app/lib/db'
 
-//Login Handler
+// Login Handler
 export const verifyUserCredentials = async (
   email: string,
   password: string,
 ): Promise<User | null> => {
-  await initializeDB()
-  return db.data?.users.find((u) => u.email === email && u.password === password) ?? null
+  const users = await db.getUsers()
+  return users.find((u) => u.email === email && u.password === password) ?? null
 }
 
 export const generateJWT = async (user: User): Promise<string> => {
@@ -37,65 +37,63 @@ export const generateJWT = async (user: User): Promise<string> => {
   return `${header}.${payload}.${btoa('mock-signature')}`
 }
 
-//Create User Handler
+// Create User Handler
 export const createUser = async (user: User): Promise<User> => {
-  await initializeDB()
+  const users = await db.getUsers()
   const newUser: User = {
     ...user,
     password: user.password ?? 'password@123',
     registrationDate: user.registrationDate ?? new Date().toISOString(),
   }
-  db.data!.users.push(newUser)
-  await db.write()
+
+  users.push(newUser)
+  await db.setUsers(users)
   return newUser
 }
 
-//Get Active Users Handler
+// Get Active Users Handler
 export const getUsersConfig = async (): Promise<UserConfig[]> => {
-  await initializeDB()
-  return (
-    db.data?.users
-      .filter((u) => u.status === 'active' && u.role !== 'superAdmin')
-      .map(({ id, name }) => ({ id, name })) ?? []
-  )
+  const users = await db.getUsers()
+  return users
+    .filter((u) => u.status === 'active' && u.role !== 'superAdmin')
+    .map(({ id, name }) => ({ id, name }))
 }
 
-//get user by id Handler
+// Get user by email Handler
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  await initializeDB()
-  return db.data?.users.find((u) => u.email === email) ?? null
+  const users = await db.getUsers()
+  return users.find((u) => u.email === email) ?? null
 }
 
-//Delete user Handler
+// Delete user Handler
 export const deleteUser = async (id: string): Promise<boolean> => {
-  await initializeDB()
-  const idx = db.data!.users.findIndex((u) => u.id === id)
+  const users = await db.getUsers()
+  const idx = users.findIndex((u) => u.id === id)
   if (idx === -1) return false
 
-  db.data!.users.splice(idx, 1)
-  await db.write()
+  users.splice(idx, 1)
+  await db.setUsers(users)
   return true
 }
 
-//Edit user Handler
+// Edit user Handler
 export const editUserById = async (id: string, updates: Partial<User>): Promise<User | null> => {
-  await initializeDB()
-  const user = db.data!.users.find((u) => u.id === id)
+  const users = await db.getUsers()
+  const user = users.find((u) => u.id === id)
   if (!user) return null
 
   Object.assign(user, updates)
-  await db.write()
+  await db.setUsers(users)
 
   const { password, ...safeUser } = user
   return safeUser
 }
 
-//Get users List Handler
+// Get users List Handler
 export const getUsersList = async (
   variables: GetUsersQueryVariables,
 ): Promise<GetUsersQuery['users']> => {
-  await initializeDB()
-  let users = db.data!.users.filter((u) => u.role !== 'superAdmin')
+  let users = (await db.getUsers()).filter((u) => u.role !== 'superAdmin')
 
   // 1. Filters
   const { role, email, status } = variables?.filters ?? {}
@@ -152,9 +150,9 @@ export const getUsersList = async (
   }
 }
 
-//Create Task Handler
+// Create Task Handler
 export const createTask = async (task: TaskInput): Promise<Task> => {
-  await initializeDB()
+  const tasks = await db.getTasks()
   const newTask: Task = {
     ...task,
     id: `task-${Date.now()}`,
@@ -162,8 +160,9 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
     updatedAt: new Date().toISOString(),
     status: TaskStatus.Backlog,
   }
-  db.data!.tasks.push(newTask)
-  await db.write()
+
+  tasks.push(newTask)
+  await db.setTasks(tasks)
   return newTask
 }
 
@@ -171,8 +170,8 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
 export const getTasksList = async (
   variables: GetTasksQueryVariables,
 ): Promise<GetTasksQuery['tasks']> => {
-  await initializeDB()
-  let tasks = db.data!.tasks
+  let tasks = await db.getTasks()
+  const users = await db.getUsers()
 
   // Filters
   const { status, search: searchRaw, assignee } = variables?.filters ?? {}
@@ -203,7 +202,7 @@ export const getTasksList = async (
 
   // Attach assignee object
   const enrichedTasks = paginated.map((task) => {
-    const assigneeUser = db.data?.users.find((u) => u.id === task.assigneeId) || null
+    const assigneeUser = users.find((u) => u.id === task.assigneeId) || null
 
     return {
       ...task,
@@ -228,24 +227,24 @@ export const getTasksList = async (
   }
 }
 
-//Update Task Handler
+// Update Task Handler
 export const updateTask = async (id: string, updates: Partial<Task>): Promise<Task | null> => {
-  await initializeDB()
-  const task = db.data!.tasks.find((t) => t.id === id)
+  const tasks = await db.getTasks()
+  const task = tasks.find((t) => t.id === id)
   if (!task) return null
 
   Object.assign(task, updates, { updatedAt: new Date().toISOString() })
-  await db.write()
+  await db.setTasks(tasks)
   return task
 }
 
-//Delete Task Handler
+// Delete Task Handler
 export const deleteTask = async (id: string): Promise<boolean> => {
-  await initializeDB()
-  const idx = db.data!.tasks.findIndex((t) => t.id === id)
+  const tasks = await db.getTasks()
+  const idx = tasks.findIndex((t) => t.id === id)
   if (idx === -1) return false
 
-  db.data!.tasks.splice(idx, 1)
-  await db.write()
+  tasks.splice(idx, 1)
+  await db.setTasks(tasks)
   return true
 }
