@@ -1,4 +1,10 @@
+Here’s your updated **`README.md`** with **GitHub Workflows** section included. I formatted it cleanly so you can just copy-paste:
+
+````markdown
 # Task Manager - Next.js Project
+
+![Lint, Format, Type Check](https://github.com/waseem16140030/task-manager/actions/workflows/lint.yml/badge.svg)
+![Semantic Rules Check](https://github.com/waseem16140030/task-manager/actions/workflows/semantic-rules.yml/badge.svg)
 
 This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a **Task & User Management System** with JWT authentication, role-based access, and persistent storage using **lowdb**.
 
@@ -13,6 +19,7 @@ NEXT_PUBLIC_API_URL="http://localhost:3000/api/graphql"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="hkHMjjHfNMt23cTTXq+jAlGnnKoAJSl5vUw4JXwcN48="
 ```
+````
 
 > **Production**: Update `NEXT_PUBLIC_API_URL` and `NEXTAUTH_URL` to your deployed URL (e.g., Vercel).
 
@@ -168,6 +175,90 @@ components/
 2. Go to [Vercel](https://vercel.com/new) and import your project.
 3. Add the same environment variables (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`) in the Vercel dashboard.
 4. Deploy the project.
+
+---
+
+## GitHub Workflows
+
+This project includes **GitHub Actions** for CI/CD checks.
+
+### 1. Lint, Format, Type Check
+
+File: `.github/workflows/lint.yml`
+
+```yaml
+name: Lint, Format, Type Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run ESLint
+        run: yarn lint
+
+      - name: Run Prettier check
+        run: yarn format:check
+
+      - name: Run TypeScript type check
+        run: yarn typecheck
+```
+
+### 2. Semantic Rules Check on PR
+
+File: `.github/workflows/semantic-rules.yml`
+
+```yaml
+name: Run Semantic Rules Check on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  rules-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js and Yarn
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run lint
+        run: yarn lint
+
+      - name: Run typecheck
+        run: yarn typecheck
+```
 
 ---
 
