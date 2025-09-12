@@ -163,6 +163,7 @@ export type Task = {
 }
 
 export type TaskFilters = {
+  assignee?: InputMaybe<Scalars['String']['input']>
   search?: InputMaybe<Scalars['String']['input']>
   status?: InputMaybe<Scalars['String']['input']>
 }
@@ -285,6 +286,13 @@ export type GetTasksQuery = {
       createdAt: string
       updatedAt: string
       assigneeId?: string | null
+      assignee?: {
+        __typename?: 'User'
+        id: string
+        name: string
+        email: string
+        role?: string | null
+      } | null
     }>
     metadata: { __typename?: 'Metadata'; total: number; page: number; pageSize: number }
   }
@@ -531,6 +539,12 @@ export const GetTasksDocument = `
       createdAt
       updatedAt
       assigneeId
+      assignee {
+        id
+        name
+        email
+        role
+      }
     }
     metadata {
       total

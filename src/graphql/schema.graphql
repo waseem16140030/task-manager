@@ -132,6 +132,7 @@ input UpdateTaskInput {
 input TaskFilters {
   status: String
   search: String
+  assignee: String
 }
 
 type TasksResponse {
