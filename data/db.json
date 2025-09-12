@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "id": "waseem6140030",
+      "name": "Muhammad Waseem",
+      "password": "admin@6Well",
+      "email": "waseem16140030@gmail.com",
+      "phone": "+11469418170",
+      "country": "Pakistan",
+      "role": "superAdmin",
+      "status": "active",
+      "registrationDate": "2025-09-12T07:41:20.773Z"
+    },
+    {
+      "id": "1757662908058",
+      "name": "Muhammad Waseem",
+      "email": "waseem16140030d@gmail.com",
+      "phone": "0923474827605",
+      "country": "USA",
+      "role": "user",
+      "status": "active",
+      "password": "password@123",
+      "registrationDate": "2025-09-12T07:41:48.059Z"
+    }
+  ],
+  "tasks": []
+}
