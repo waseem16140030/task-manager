@@ -12,6 +12,7 @@ import {
 } from '@/graphql/generated/graphql'
 
 import { db } from '@/app/lib/db'
+import { pusherServer } from '.'
 
 // Login Handler
 export const verifyUserCredentials = async (
@@ -163,6 +164,18 @@ export const createTask = async (task: TaskInput): Promise<Task> => {
 
   tasks.push(newTask)
   await db.setTasks(tasks)
+
+  if (newTask.assigneeId) {
+    await pusherServer.trigger(`user-${newTask.assigneeId}`, 'task-assigned', {
+      id: newTask.id,
+      title: newTask.title,
+      description: newTask.description,
+      status: newTask.status,
+      assigneeId: newTask.assigneeId,
+      createdAt: newTask.createdAt,
+    })
+  }
+
   return newTask
 }
 
@@ -235,6 +248,19 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<Ta
 
   Object.assign(task, updates, { updatedAt: new Date().toISOString() })
   await db.setTasks(tasks)
+
+  // Notify assignee via Pusher
+  if (task.assigneeId) {
+    await pusherServer.trigger(`user-${task.assigneeId}`, 'task-updated', {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      assigneeId: task.assigneeId,
+      updatedAt: task.updatedAt,
+    })
+  }
+
   return task
 }
 
@@ -244,7 +270,18 @@ export const deleteTask = async (id: string): Promise<boolean> => {
   const idx = tasks.findIndex((t) => t.id === id)
   if (idx === -1) return false
 
-  tasks.splice(idx, 1)
+  const [deletedTask] = tasks.splice(idx, 1)
   await db.setTasks(tasks)
+
+  // Notify assignee via Pusher
+  if (deletedTask.assigneeId) {
+    await pusherServer.trigger(`user-${deletedTask.assigneeId}`, 'task-deleted', {
+      id: deletedTask.id,
+      title: deletedTask.title,
+      description: deletedTask.description,
+      assigneeId: deletedTask.assigneeId,
+    })
+  }
+
   return true
 }

@@ -4,7 +4,7 @@
 ![Lint, Format, Type Check](https://github.com/waseem16140030/task-manager/actions/workflows/lint.yml/badge.svg)
 ![Semantic Rules Check](https://github.com/waseem16140030/task-manager/actions/workflows/semantic-rules.yml/badge.svg)
 
-This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a **Task & User Management System** with JWT authentication, role-based access, and persistent storage using **lowdb**.
+This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a **Task & User Management System** with JWT authentication, role-based access, persistent storage on **Redis (Upstash)**, and **real-time notifications using Pusher**.
 
 ---
 
@@ -16,6 +16,22 @@ Create a `.env.local` file in the root of your project and add the following:
 NEXT_PUBLIC_API_URL="http://localhost:3000/api/graphql"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="hkHMjjHfNMt23cTTXq+jAlGnnKoAJSl5vUw4JXwcN48="
+
+# Redis / Upstash
+KV_URL="rediss://default:AThoAAIncDEyNTVmYTc4ZGM3ZDc0MjFhODBiYzEzMzliYjU4Mzk4M3AxMTQ0NDA@golden-vervet-14440.upstash.io:6379"
+KV_REST_API_URL="https://golden-vervet-14440.upstash.io"
+KV_REST_API_TOKEN="AThoAAIncDEyNTVmYTc4ZGM3ZDc0MjFhODBiYzEzMzliYjU4Mzk4M3AxMTQ0NDA"
+KV_REST_API_READ_ONLY_TOKEN="AjhoAAIgcDEQESyQD0rkcRZ6S50-Pt_Yc1Lm8s0h_qgHr3X3em7UBw"
+REDIS_URL="rediss://default:AThoAAIncDEyNTVmYTc4ZGM3ZDc0MjFhODBiYzEzMzliYjU4Mzk4M3AxMTQ0NDA@golden-vervet-14440.upstash.io:6379"
+
+# Pusher (Real-time notifications)
+PUSHER_APP_ID=2049916
+PUSHER_KEY=0fe6c94c9521201a7a7c
+PUSHER_SECRET=78d3f8d88b38db7dcbf6
+PUSHER_CLUSTER=ap3
+
+NEXT_PUBLIC_PUSHER_KEY=0fe6c94c9521201a7a7c
+NEXT_PUBLIC_PUSHER_CLUSTER=ap3
 ```
 ````
 
@@ -25,7 +41,7 @@ NEXTAUTH_SECRET="hkHMjjHfNMt23cTTXq+jAlGnnKoAJSl5vUw4JXwcN48="
 
 ## Default SuperAdmin Account
 
-On first run, the database is seeded with a **SuperAdmin** account:
+On first run, the system creates a **SuperAdmin** account:
 
 ```
 Email:    waseem16140030@gmail.com
@@ -34,10 +50,10 @@ Password: admin@6Well
 
 ### Role Rules
 
-- `superAdmin` and `admin` → Full access, including **User Management**.
-- `user` → Limited access, cannot see or manage users.
-- **Registration** (sign-up) always creates a `user` role.
-- Admins can add users manually (default password = `password@123`).
+- `superAdmin` and `admin` → Full access including **User Management**.
+- `user` → Limited access, cannot manage users.
+- Registration always creates `user` role accounts.
+- Admin-created users start with default password `password@123`.
 
 ---
 
@@ -47,17 +63,20 @@ Password: admin@6Well
 
 - Only **admin** and **superAdmin** can access User Management.
 - Add, update, activate/deactivate, and delete users.
-- Registration form creates `user` role accounts only.
-- Admin-created users get a default password `password@123` (user can later change).
-- SuperAdmin account is seeded in the database at first initialization.
+- Registration form creates `user` role accounts.
+- SuperAdmin account is seeded at first initialization.
 
 ### Task Management
 
 - Create, update, and delete tasks.
-- Filter tasks by status or search keyword.
+- Filter tasks by status, assignee, or search keyword.
 - Pagination and sorting.
 - Timestamps for `createdAt` and `updatedAt`.
 - Task statuses: `Backlog`, `In Progress`, `Completed`.
+- **Real-time notifications** via **Pusher** for:
+  - Task assigned
+  - Task updated
+  - Task deleted
 
 ### Authentication & Authorization
 
@@ -69,15 +88,13 @@ Password: admin@6Well
 
 ### Persistence
 
-- Data is stored in a **JSON file** using [lowdb](https://github.com/typicode/lowdb).
-- File: `data/db.json`
-- Persists across sessions like a real database.
+- Uses **Redis (Upstash)** for server-side storage.
+- Data persists across sessions and supports high concurrency.
 
 ### Forms & Validation
 
 - Forms managed via `react-hook-form`.
 - Schema validation using `yup`.
-- Password, email, and phone validation.
 - Custom error messages for required fields.
 
 ### UI & Components
@@ -85,7 +102,7 @@ Password: admin@6Well
 - Built with **Ant Design**.
 - Fully responsive layout.
 - Custom components: `InputField`, `PasswordField`, `TMText`, `Button`, etc.
-- Notification system via `useGlobalNotification`.
+- Global notification system via `useGlobalNotification`.
 
 ---
 
@@ -117,24 +134,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Scripts
-
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Lint code
-npm run lint
-```
-
----
-
 ## Project Architecture
 
 ```
@@ -146,12 +145,13 @@ app/
 ├─ tasks-management/
 ├─ users-management/
 lib/
-├─ db.ts          # lowdb database initialization
+├─ db.ts          # Redis / Upstash DB interface
 ├─ services/
 │  ├─ auth.ts
 │  ├─ login.ts
 │  ├─ tasks.ts
 │  └─ users.ts
+├─ pusher-server.ts
 components/
 ├─ InputField.tsx
 ├─ PasswordField.tsx
@@ -160,7 +160,8 @@ components/
 ...
 ```
 
-- **`lib/db.ts`** → Initializes lowdb with default SuperAdmin + empty tasks.
+- **`lib/db.ts`** → Connects to Upstash Redis.
+- **`lib/pusher-server.ts`** → Server-side Pusher instance for real-time notifications.
 - **`lib/services`** → Server actions for login, users, and tasks.
 - **`components`** → Reusable UI components with Ant Design.
 - **`app`** → Next.js routes for auth, dashboard, tasks, users.
@@ -170,106 +171,22 @@ components/
 ## Deployment on Vercel
 
 1. Push your project to a Git repository.
-2. Go to [Vercel](https://vercel.com/new) and import your project.
-3. Add the same environment variables (`NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`) in the Vercel dashboard.
-4. Deploy the project.
-
----
-
-## GitHub Workflows
-
-This project includes **GitHub Actions** for CI/CD checks.
-
-### 1. Lint, Format, Type Check
-
-File: `.github/workflows/lint.yml`
-
-```yaml
-name: Lint, Format, Type Check
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run ESLint
-        run: yarn lint
-
-      - name: Run Prettier check
-        run: yarn format:check
-
-      - name: Run TypeScript type check
-        run: yarn typecheck
-```
-
-### 2. Semantic Rules Check on PR
-
-File: `.github/workflows/semantic-rules.yml`
-
-```yaml
-name: Run Semantic Rules Check on PR
-
-on:
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  rules-check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js and Yarn
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org/'
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run lint
-        run: yarn lint
-
-      - name: Run typecheck
-        run: yarn typecheck
-```
-
----
-
-## Notes
-
-- Database uses **lowdb** JSON file for persistence.
-- Only `admin` and `superAdmin` can access User Management.
-- Registration always creates a `user` role.
-- Admin-created users start with default password `password@123`.
-- SuperAdmin account is pre-seeded at startup.
+2. Import your project into [Vercel](https://vercel.com/new).
+3. Add environment variables (Redis + Pusher + NextAuth) in Vercel dashboard.
+4. Deploy the project. **Real-time notifications work automatically** without custom server setup.
 
 ---
 
 ## License
 
 This project is open source and available under the MIT License.
+
+```
+
+✅ This version clearly documents:
+
+- Redis/Upstash as the database instead of lowdb
+- Pusher-based real-time notifications (assign, update, delete)
+- Updated environment variables
+
+```

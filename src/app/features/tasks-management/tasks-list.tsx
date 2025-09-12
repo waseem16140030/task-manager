@@ -23,7 +23,9 @@ export function TasksList() {
     selectedFilters,
   } = usePaginatedQueryParams({
     filterKeys: ['status', 'assignee'],
-    defaultValues: { pageSize: 8 },
+    defaultValues: {
+      pageSize: 8,
+    },
   })
   const options = useTaskStatusOptions()
 
@@ -38,12 +40,20 @@ export function TasksList() {
       status: selectedFilters?.status,
       assignee: selectedFilters?.assignee,
     },
+    pagination: {
+      page: current,
+      pageSize,
+    },
   })
   const queryFn = useGetTasksQuery.fetcher({
     filters: {
       search,
       status: selectedFilters.status,
       assignee: selectedFilters?.assignee,
+    },
+    pagination: {
+      page: current,
+      pageSize,
     },
   })
 
@@ -168,7 +178,7 @@ export function TasksList() {
           )}
           pagination={{
             total: metadata?.total,
-            current,
+            current: current ?? 1,
             pageSize,
             onChange: handlePagination,
           }}
