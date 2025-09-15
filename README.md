@@ -6,14 +6,6 @@
 
 This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), featuring a **Task & User Management System** with JWT authentication, role-based access, persistent storage on **Redis (Upstash)**, and **real-time notifications using Pusher**.
 
----
-
-## 🚀 Live Demo
-
-👉 [Task Manager - Deployed on Vercel](https://task-manager-rouge-seven.vercel.app/tasks-management)
-
----
-
 ## Environment Variables
 
 Create a `.env.local` file in the root of your project and add the following:
@@ -42,6 +34,12 @@ NEXT_PUBLIC_PUSHER_CLUSTER=ap3
 ````
 
 > **Production**: Update `NEXT_PUBLIC_API_URL` and `NEXTAUTH_URL` to your deployed URL (e.g., Vercel).
+
+---
+
+## 🚀 Live Demo
+
+👉 [Task Manager - Deployed on Vercel](https://task-manager-rouge-seven.vercel.app/tasks-management)
 
 ---
 
