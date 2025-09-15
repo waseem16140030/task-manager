@@ -65,7 +65,6 @@ export function TasksList() {
 
   const { tasks } = tasksData ?? {}
   const { data, metadata } = tasks ?? {}
-  console.log(current, 'current')
 
   return (
     <Card size="small" variant="borderless" className="tw:h-full">
