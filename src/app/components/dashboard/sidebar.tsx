@@ -25,7 +25,7 @@ export function DashboardSidebar() {
   const { token } = theme.useToken()
   const { Sider } = Layout
   const { data: session } = useSession()
-  const role = session?.user?.role
+  const role = session?.user?.role ?? 'user'
 
   const siderStyle: React.CSSProperties = {
     insetInlineStart: 0,
