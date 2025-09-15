@@ -25,6 +25,7 @@ export function TasksList() {
     filterKeys: ['status', 'assignee'],
     defaultValues: {
       pageSize: 8,
+      current: 1,
     },
   })
   const options = useTaskStatusOptions()
@@ -64,6 +65,7 @@ export function TasksList() {
 
   const { tasks } = tasksData ?? {}
   const { data, metadata } = tasks ?? {}
+  console.log(current, 'current')
 
   return (
     <Card size="small" variant="borderless" className="tw:h-full">
