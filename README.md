@@ -8,6 +8,12 @@ This is a **Next.js 13+ (App Router)** project bootstrapped with [`create-next-a
 
 ---
 
+## 🚀 Live Demo
+
+👉 [Task Manager - Deployed on Vercel](https://task-manager-rouge-seven.vercel.app/tasks-management)
+
+---
+
 ## Environment Variables
 
 Create a `.env.local` file in the root of your project and add the following:
